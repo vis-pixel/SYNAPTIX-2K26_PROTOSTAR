@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantum Companion — Sign In</title>
+    <meta name="description" content="Secure login to Quantum Companion Antigravity Intelligence Platform." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #080c14;
+            --card: rgba(13, 18, 32, 0.95);
+            --border: rgba(108, 99, 255, 0.22);
+            --purple: #6C63FF;
+            --cyan: #00D4FF;
+            --pink: #FF4E6A;
+            --green: #00E5A0;
+            --text: #EAEEff;
+            --dim: #8892B0;
+            --dimmer: #4A5568;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 20% 15%, rgba(108, 99, 255, 0.15) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 85%, rgba(0, 212, 255, 0.10) 0%, transparent 55%);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        /* ─── Floating Particles ─── */
+        #particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .p {
+            position: absolute;
+            border-radius: 50%;
+            animation: rise linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes rise {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(1);
+            }
+
+            10% {
+                opacity: 0.7;
+            }
+
+            85% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) scale(0.5);
+            }
+        }
+
+        /* ─── Card ─── */
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 430px;
+            max-width: calc(100vw - 32px);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 40px 42px 36px;
+            backdrop-filter: blur(28px);
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(108, 99, 255, 0.08);
+            animation: revealCard 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+
+        @keyframes revealCard {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ─── Brand ─── */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .brand-icon {
+            width: 54px;
+            height: 54px;
+            background: rgba(108, 99, 255, 0.12);
+            border: 1px solid rgba(108, 99, 255, 0.30);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 40%, #6C63FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            color: var(--cyan);
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        /* ─── Welcome ─── */
+        .welcome {
+            margin-bottom: 28px;
+        }
+
+        .welcome h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 23px;
+            font-weight: 700;
+        }
+
+        .welcome p {
+            font-size: 13px;
+            color: var(--dim);
+            margin-top: 5px;
+        }
+
+        /* ─── Fields ─── */
+        .fields {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--dim);
+            letter-spacing: 0.3px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .ico {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dimmer);
+            pointer-events: none;
+            transition: color var(--transition);
+        }
+
+        .input-wrap:focus-within .ico {
+            color: var(--purple);
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 42px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 11px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input::placeholder {
+            color: var(--dimmer);
+        }
+
+        input:focus {
+            border-color: rgba(108, 99, 255, 0.5);
+            background: rgba(108, 99, 255, 0.06);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+        }
+
+        input.error-field {
+            border-color: rgba(255, 78, 106, 0.5);
+            background: rgba(255, 78, 106, 0.05);
+        }
+
+        .pw-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--dimmer);
+            padding: 4px;
+            border-radius: 4px;
+            transition: color var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pw-toggle:hover {
+            color: var(--text);
+        }
+
+        /* ─── Attempt indicator ─── */
+        .attempt-bar {
+            display: flex;
+            gap: 6px;
+            margin-top: 2px;
+            height: 14px;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .attempt-bar.visible {
+            opacity: 1;
+        }
+
+        .attempt-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 78, 106, 0.3);
+            border: 1px solid rgba(255, 78, 106, 0.5);
+            transition: background var(--transition);
+        }
+
+        .attempt-dot.used {
+            background: var(--pink);
+        }
+
+        .attempt-label {
+            font-size: 11px;
+            color: var(--dim);
+            margin-left: 2px;
+        }
+
+        /* ─── Error banner ─── */
+        .error-banner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+            background: rgba(255, 78, 106, 0.08);
+            border: 1px solid rgba(255, 78, 106, 0.25);
+            border-radius: 10px;
+            font-size: 12.5px;
+            color: var(--pink);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s, padding 0.3s;
+        }
+
+        .error-banner.show {
+            max-height: 52px;
+            padding: 11px 14px;
+        }
+
+        /* ─── Submit ─── */
+        .submit-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--cyan) 100%);
+            border: none;
+            border-radius: 11px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.35);
+            transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(108, 99, 255, 0.45);
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            display: none;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .submit-btn.loading .btn-text {
+            opacity: 0.5;
+        }
+
+        .submit-btn.loading .spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ─── Success overlay inside card ─── */
+        .success-overlay {
+            position: absolute;
+            inset: 0;
+            border-radius: 22px;
+            background: rgba(13, 18, 32, 0.97);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 14px;
+            padding: 32px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            z-index: 10;
+        }
+
+        .success-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .success-check {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(0, 229, 160, 0.12);
+            border: 2px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--green);
+        }
+
+        .success-sub {
+            font-size: 13px;
+            color: var(--dim);
+        }
+
+        .success-redirect {
+            font-size: 12px;
+            color: var(--dimmer);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ─── Divider ─── */
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 20px 0 0;
+            font-size: 12px;
+            color: var(--dimmer);
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .divider span {
+            position: relative;
+            background: rgba(13, 18, 32, 0.95);
+            padding: 0 10px;
+        }
+
+        /* ─── Footer ─── */
+        .footer {
+            margin-top: 22px;
+            display: flex;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--dimmer);
+            gap: 5px;
+            align-items: center;
+        }
+
+        /* ─── Locked state ─── */
+        .locked-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            background: rgba(255, 78, 106, 0.08);
+            border: 1px solid rgba(255, 78, 106, 0.25);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--pink);
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .locked-banner.show {
+            display: flex;
+        }
+
+        .countdown {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Floating particles -->
+    <div id="particles"></div>
+
+    <div class="card">
+        <!-- Success overlay -->
+        <div class="success-overlay" id="successOverlay">
+            <div class="success-check">✓</div>
+            <div class="success-title">Welcome to Antigravity System</div>
+            <div class="success-sub">Authentication successful. Loading dashboard...</div>
+            <div class="success-redirect" id="redirectCountdown">Redirecting in 2s...</div>
+        </div>
+
+        <!-- Brand -->
+        <div class="brand">
+            <div class="brand-icon">
+                <svg width="30" height="30" viewBox="0 0 28 28" fill="none">
+                    <circle cx="14" cy="14" r="12" stroke="url(#lg1)" stroke-width="2" />
+                    <circle cx="14" cy="14" r="6" fill="url(#lg2)" opacity="0.85" />
+                    <circle cx="14" cy="14" r="2" fill="#fff" />
+                    <defs>
+                        <linearGradient id="lg1" x1="0" y1="0" x2="28" y2="28">
+                            <stop stop-color="#6C63FF" />
+                            <stop offset="1" stop-color="#00D4FF" />
+                        </linearGradient>
+                        <linearGradient id="lg2" x1="0" y1="0" x2="28" y2="28">
+                            <stop stop-color="#6C63FF" />
+                            <stop offset="1" stop-color="#00D4FF" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div>
+                <div class="brand-name">Quantum Companion</div>
+                <div class="brand-sub">ANTIGRAVITY INTELLIGENCE PLATFORM</div>
+            </div>
+        </div>
+
+        <!-- Welcome -->
+        <div class="welcome">
+            <h1>Sign in</h1>
+            <p>Enter your credentials to access the Antigravity dashboard</p>
+        </div>
+
+        <!-- Locked banner -->
+        <div class="locked-banner" id="lockedBanner">
+            🔒 Account temporarily locked. Try again in <span class="countdown" id="countdownVal">30</span>s
+        </div>
+
+        <!-- Error banner -->
+        <div class="error-banner" id="errorBanner">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span id="errorMsg">Invalid Username or Password</span>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" novalidate>
+            <div class="fields">
+                <div class="field">
+                    <label for="uname">Username</label>
+                    <div class="input-wrap">
+                        <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <input type="text" id="uname" placeholder="Enter username" autocomplete="username"
+                            spellcheck="false" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="pw">Password</label>
+                    <div class="input-wrap">
+                        <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <input type="password" id="pw" placeholder="Enter password" autocomplete="current-password" />
+                        <button type="button" class="pw-toggle" id="pwToggle" aria-label="Toggle password visibility">
+                            <svg id="eyeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Attempt counter dots -->
+                <div class="attempt-bar" id="attemptBar">
+                    <div class="attempt-dot" id="dot1"></div>
+                    <div class="attempt-dot" id="dot2"></div>
+                    <div class="attempt-dot" id="dot3"></div>
+                    <span class="attempt-label" id="attemptLabel">3 attempts remaining</span>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span class="btn-text">Sign In</span>
+                <span class="spinner"></span>
+            </button>
+        </form>
+
+        <div class="divider"><span>Secured by AES-256 · HIPAA Compliant</span></div>
+
+        <div class="footer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            v2.4.1 Build 2026.2 &nbsp;·&nbsp; Quantum Companion
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        // ─── AUTH CREDENTIALS ───
+        const VALID_USER = 'kavya';
+        const VALID_PASS = '1234';
+        const MAX_ATTEMPTS = 3;
+        const LOCKOUT_SECS = 30;
+
+        // ─── STATE ───
+        let attempts = 0;
+        let locked = false;
+        let lockTimer = null;
+
+        // ─── DOM ───
+        const form = document.getElementById('loginForm');
+        const unameInput = document.getElementById('uname');
+        const pwInput = document.getElementById('pw');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorBanner = document.getElementById('errorBanner');
+        const errorMsg = document.getElementById('errorMsg');
+        const attemptBar = document.getElementById('attemptBar');
+        const attemptLbl = document.getElementById('attemptLabel');
+        const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
+        const successOvl = document.getElementById('successOverlay');
+        const rdCount = document.getElementById('redirectCountdown');
+        const lockedBanner = document.getElementById('lockedBanner');
+        const countdownVal = document.getElementById('countdownVal');
+        const pwToggle = document.getElementById('pwToggle');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        // ─── ANIMATED BG PARTICLES ───
+        (function spawnParticles() {
+            const container = document.getElementById('particles');
+            const colors = ['rgba(108,99,255,0.5)', 'rgba(0,212,255,0.4)', 'rgba(255,78,106,0.3)', 'rgba(0,229,160,0.4)'];
+            for (let i = 0; i < 28; i++) {
+                const el = document.createElement('div');
+                el.className = 'p';
+                const size = 3 + Math.random() * 7;
+                el.style.cssText = `
+        width:${size}px; height:${size}px;
+        left:${Math.random() * 100}%;
+        bottom:${-10 + Math.random() * 20}%;
+        background:${colors[Math.floor(Math.random() * colors.length)]};
+        animation-duration:${6 + Math.random() * 10}s;
+        animation-delay:${Math.random() * 8}s;
+        filter:blur(${Math.random() > 0.5 ? 1 : 0}px);
+      `;
+                container.appendChild(el);
+            }
+        })();
+
+        // ─── PASSWORD TOGGLE ───
+        pwToggle.addEventListener('click', () => {
+            const show = pwInput.type === 'password';
+            pwInput.type = show ? 'text' : 'password';
+            eyeIcon.innerHTML = show
+                ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+                : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        });
+
+        // ─── CLEAR ERRORS on input ───
+        [unameInput, pwInput].forEach(inp => {
+            inp.addEventListener('input', () => {
+                inp.classList.remove('error-field');
+                errorBanner.classList.remove('show');
+            });
+        });
+
+        // ─── UPDATE ATTEMPT UI ───
+        function updateAttemptUI() {
+            attemptBar.classList.add('visible');
+            const remaining = MAX_ATTEMPTS - attempts;
+            dots.forEach((d, i) => d.classList.toggle('used', i < attempts));
+            attemptLbl.textContent = remaining === 1 ? '1 attempt remaining' : `${remaining} attempts remaining`;
+            attemptLbl.style.color = remaining === 1 ? '#FF4E6A' : '#8892B0';
+        }
+
+        // ─── SHOW ERROR ───
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorBanner.classList.add('show');
+            unameInput.classList.add('error-field');
+            pwInput.classList.add('error-field');
+            // Shake card
+            const card = document.querySelector('.card');
+            card.style.animation = 'none';
+            card.offsetHeight; // reflow
+            card.style.animation = 'shake 0.4s ease';
+        }
+
+        // Shake keyframe
+        const shakeStyle = document.createElement('style');
+        shakeStyle.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}';
+        document.head.appendChild(shakeStyle);
+
+        // ─── LOCK ACCOUNT ───
+        function lockAccount() {
+            locked = true;
+            submitBtn.disabled = true;
+            lockedBanner.classList.add('show');
+            errorBanner.classList.remove('show');
+            attemptBar.classList.remove('visible');
+            let secs = LOCKOUT_SECS;
+            countdownVal.textContent = secs;
+            lockTimer = setInterval(() => {
+                secs--;
+                countdownVal.textContent = secs;
+                if (secs <= 0) {
+                    clearInterval(lockTimer);
+                    locked = false;
+                    attempts = 0;
+                    submitBtn.disabled = false;
+                    lockedBanner.classList.remove('show');
+                    dots.forEach(d => d.classList.remove('used'));
+                    attemptBar.classList.remove('visible');
+                    unameInput.value = '';
+                    pwInput.value = '';
+                    unameInput.focus();
+                }
+            }, 1000);
+        }
+
+        // ─── SUCCESS ───
+        function handleSuccess() {
+            successOvl.classList.add('show');
+            sessionStorage.setItem('qc_auth', 'kavya');
+            sessionStorage.setItem('qc_user', 'Kavya');
+            let countdown = 2;
+            const tick = setInterval(() => {
+                countdown--;
+                rdCount.textContent = `Redirecting in ${countdown}s...`;
+                if (countdown <= 0) {
+                    clearInterval(tick);
+                    window.location.href = 'index.html';
+                }
+            }, 1000);
+        }
+
+        // ─── FORM SUBMIT ───
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (locked) return;
+
+            const user = unameInput.value.trim();
+            const pass = pwInput.value;
+
+            // Validation
+            if (!user || !pass) {
+                showError('Please enter both username and password.');
+                return;
+            }
+
+            // Simulate auth delay
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                submitBtn.classList.remove('loading');
+
+                if (user === VALID_USER && pass === VALID_PASS) {
+                    handleSuccess();
+                } else {
+                    attempts++;
+                    updateAttemptUI();
+                    if (attempts >= MAX_ATTEMPTS) {
+                        lockAccount();
+                    } else {
+                        submitBtn.disabled = false;
+                        showError('Invalid Username or Password');
+                    }
+                }
+            }, 800);
+        });
+
+        // Focus username on load
+        setTimeout(() => unameInput.focus(), 300);
+    </script>
+</body>
+
+</html>
