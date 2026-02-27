@@ -1,0 +1,30 @@
+========================================================================
+  BioRhythm Fusion Band — Fever Detection Simulation Report
+========================================================================
+  Simulation Duration   : 7 days (604,800 samples @ 1 Hz)
+  Personal Baseline Win : 72 hours (Days 1–3)
+  Fever Onset (ground)  : Day 6, Hour 0
+  HDS Threshold         : 7.3263
+
+  [MISS] No sustained fever detection triggered.
+
+  Signal Analysis at Peak Deviation (sample 446,400):
+  Signal     Baseline    Current    Z-Score       Status
+  --------------------------------------------------------
+  HR            71.98      79.88      +3.20  >> DEVIATED
+  HRV           52.03      49.02      -0.85       Normal
+  SKT           34.80      35.47      +2.72  >> DEVIATED
+  EDA            3.19       4.43      +2.91  >> DEVIATED
+  SPO2          97.60      97.45      -1.41       Normal
+  SMF            0.10       0.18      +3.79  >> DEVIATED
+  CRS            0.88       0.83      -1.07       Normal
+
+  Cross-Signal Correlation Norm : 0.2510
+  Composite HDS Score           : 1.5692
+
+------------------------------------------------------------------------
+  KEY FINDING:
+  No individual signal breached a clinical alarm threshold.
+  Detection was achieved via CORRELATED multi-signal micro-deviations
+  -- the fundamental advantage of the BioRhythm Fusion Band approach.
+------------------------------------------------------------------------

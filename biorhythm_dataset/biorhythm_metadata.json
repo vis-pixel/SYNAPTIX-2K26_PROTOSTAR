@@ -1,0 +1,88 @@
+{
+  "generated_at": "2026-02-27T14:12:44.655648",
+  "generator_ver": "1.0.0",
+  "num_subjects": 3,
+  "days_per_subject": 1,
+  "total_raw_samples": 259200,
+  "total_windows": 8634,
+  "train_windows": 6043,
+  "val_windows": 1295,
+  "test_windows": 1296,
+  "window_size_sec": 60,
+  "window_stride_sec": 30,
+  "signal_channels": [
+    "HR",
+    "HRV",
+    "SKT",
+    "EDA",
+    "SPO2",
+    "SMF",
+    "CRS"
+  ],
+  "num_classes": 8,
+  "class_names": {
+    "0": "Normal_Baseline",
+    "1": "Early_Viral_Infection",
+    "2": "Chronic_Inflammation",
+    "3": "Overtraining_Burnout",
+    "4": "Hormonal_Imbalance",
+    "5": "Early_Metabolic_Disorder",
+    "6": "Immune_Suppression",
+    "7": "Psychological_Burnout"
+  },
+  "class_distribution_samples": {
+    "Normal_Baseline": 228111,
+    "Early_Viral_Infection": 8942,
+    "Chronic_Inflammation": 2169,
+    "Overtraining_Burnout": 3219,
+    "Hormonal_Imbalance": 3998,
+    "Early_Metabolic_Disorder": 1863,
+    "Immune_Suppression": 0,
+    "Psychological_Burnout": 10898
+  },
+  "normalization": "z-score per feature",
+  "feat_mean": [
+    74.52609252929688,
+    47.896732330322266,
+    35.65586471557617,
+    5.237427234649658,
+    97.41638946533203,
+    0.14529527723789215,
+    0.7713398337364197
+  ],
+  "feat_std": [
+    6.048902988433838,
+    14.805681228637695,
+    0.5445688962936401,
+    0.9847537279129028,
+    0.5929683446884155,
+    0.0769924521446228,
+    0.07357540726661682
+  ],
+  "schema": {
+    "subject_id": "int \u2014 unique patient ID",
+    "timestamp": "datetime \u2014 ISO-8601 UTC",
+    "age": "int \u2014 subject age (22\u201372)",
+    "gender": "str \u2014 M/F",
+    "HR": "float \u2014 Heart Rate (bpm) [40\u2013220]",
+    "HRV": "float \u2014 HRV RMSSD (ms) [5\u2013130]",
+    "SKT": "float \u2014 Skin Temperature (\u00b0C) [30\u201340]",
+    "EDA": "float \u2014 Electrodermal Activity (\u03bcS) [0.1\u201320]",
+    "SPO2": "float \u2014 Peripheral SpO2 (%) [88\u2013100]",
+    "SMF": "float \u2014 Sleep Micro-Fragmentation Index [0\u20131]",
+    "CRS": "float \u2014 Circadian Rhythm Stability Score [0\u20131]",
+    "label": "int \u2014 Disease class [0\u20137]",
+    "label_name": "str \u2014 Human-readable class name"
+  },
+  "model_input_shape": [
+    60,
+    7
+  ],
+  "recommended_models": [
+    "LSTM Autoencoder (anomaly detection via reconstruction error)",
+    "Bidirectional LSTM + Dense classifier",
+    "Transformer Encoder + MLP head",
+    "CNN-LSTM Hybrid for local + temporal features",
+    "Informer / TimesNet for long-range circadian dependencies"
+  ]
+}
