@@ -1,0 +1,99 @@
+{
+  "model_type": "LSTM_Autoencoder",
+  "version": "1.0.0",
+  "trained_at": "2026-02-27T18:59:54.737802",
+  "architecture": {
+    "n_features": 12,
+    "seq_len": 12,
+    "encoder_layers": [
+      64,
+      32
+    ],
+    "decoder_layers": [
+      64,
+      12
+    ]
+  },
+  "feature_columns": [
+    "heart_rate",
+    "hrv_rmssd",
+    "spo2",
+    "eda",
+    "skin_temp",
+    "respiration",
+    "steps",
+    "bp_systolic",
+    "bp_diastolic",
+    "sleep_stage",
+    "sleep_quality",
+    "hour_of_day"
+  ],
+  "normalization_ranges": {
+    "heart_rate": [
+      35,
+      200
+    ],
+    "hrv_rmssd": [
+      5,
+      150
+    ],
+    "spo2": [
+      70,
+      100
+    ],
+    "eda": [
+      0.1,
+      20
+    ],
+    "skin_temp": [
+      30,
+      42
+    ],
+    "respiration": [
+      4,
+      40
+    ],
+    "steps": [
+      0,
+      1000
+    ],
+    "bp_systolic": [
+      80,
+      200
+    ],
+    "bp_diastolic": [
+      50,
+      130
+    ],
+    "sleep_stage": [
+      0,
+      3
+    ],
+    "sleep_quality": [
+      0,
+      1
+    ],
+    "hour_of_day": [
+      0,
+      24
+    ]
+  },
+  "thresholds": {
+    "normal_max": 0.243416,
+    "warning_max": 0.269166,
+    "critical_above": 0.269166
+  },
+  "statistics": {
+    "healthy_error_mean": 0.204791,
+    "healthy_error_std": 0.02575,
+    "disease_error_mean": 0.187884,
+    "training_samples": 1410,
+    "validation_samples": 3290
+  },
+  "risk_formula": "risk_score = min(100, max(0, (error - healthy_mean) / (3 * healthy_std) * 100))",
+  "alert_levels": {
+    "Normal": "risk_score < 60",
+    "Warning": "60 <= risk_score < 80",
+    "Critical": "risk_score >= 80"
+  }
+}

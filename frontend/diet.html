@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+    <title>BioRhythm X — Diet & Nutrition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #080F1E;
+            --card: #0E1728;
+            --card2: #131E30;
+            --teal: #00E5CC;
+            --pink: #FF4C7A;
+            --purple: #8B5CF6;
+            --orange: #F59E0B;
+            --green: #22C55E;
+            --text: #E8F0FE;
+            --muted: #6B7DA8;
+            --border: rgba(255, 255, 255, 0.07)
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 430px;
+            margin: 0 auto;
+            padding-bottom: 90px;
+            min-height: 100vh
+        }
+
+        .header {
+            padding: 20px 20px 14px;
+            background: rgba(8, 15, 30, 0.92);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 50
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        .scroll {
+            padding: 0 20px
+        }
+
+        /* Macro donut summary */
+        .macro-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 22px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 20px
+        }
+
+        .donut-wrap {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0
+        }
+
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center
+        }
+
+        .donut-center span {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--orange)
+        }
+
+        .donut-center label {
+            font-size: 9px;
+            color: var(--muted);
+            display: block
+        }
+
+        .macros {
+            flex: 1
+        }
+
+        .macro-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px
+        }
+
+        .macro-label {
+            font-size: 13px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .mac-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px
+        }
+
+        .macro-val {
+            font-size: 14px;
+            font-weight: 700
+        }
+
+        .macro-bar {
+            height: 5px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            margin-top: 3px
+        }
+
+        .macro-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1.5s ease
+        }
+
+        /* Meal cards */
+        .meal-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: .2s
+        }
+
+        .meal-card:hover {
+            transform: scale(1.01)
+        }
+
+        .meal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px
+        }
+
+        .meal-title {
+            font-size: 15px;
+            font-weight: 700
+        }
+
+        .meal-time {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .meal-kcal {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--orange)
+        }
+
+        .meal-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+        .meal-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px
+        }
+
+        .meal-item-name {
+            color: var(--muted)
+        }
+
+        .meal-item-cal {
+            color: var(--text);
+            font-weight: 600
+        }
+
+        /* Water reminder */
+        .water-reminder {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(0, 229, 204, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 14px
+        }
+
+        /* Nutrient tags */
+        .nutrient-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px
+        }
+
+        .ntag {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid
+        }
+
+        /* Bottom nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: rgba(8, 15, 30, 0.95);
+            backdrop-filter: blur(30px);
+            border-top: 1px solid var(--border);
+            padding: 10px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            padding: 4px 18px
+        }
+
+        .nav-icon {
+            font-size: 22px
+        }
+
+        .nav-label {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 600
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--teal)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Diet & Nutrition</h1>
+        <p id="diet-date">Today's intake</p>
+    </div>
+
+    <div class="scroll">
+        <!-- Macro summary -->
+        <div class="macro-card">
+            <div class="donut-wrap">
+                <svg width="90" height="90" viewBox="0 0 90 90" style="transform:rotate(-90deg)">
+                    <circle cx="45" cy="45" r="32" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="9" />
+                    <!-- Protein -->
+                    <circle cx="45" cy="45" r="32" fill="none" stroke="#FF4C7A" stroke-width="9" stroke-linecap="round"
+                        stroke-dasharray="201" stroke-dashoffset="151" />
+                    <!-- Carbs -->
+                    <circle cx="45" cy="45" r="32" fill="none" stroke="#F59E0B" stroke-width="9" stroke-linecap="round"
+                        stroke-dasharray="201" stroke-dashoffset="99" opacity="0.7" />
+                    <!-- Fat -->
+                    <circle cx="45" cy="45" r="32" fill="none" stroke="#8B5CF6" stroke-width="9" stroke-linecap="round"
+                        stroke-dasharray="201" stroke-dashoffset="169" opacity="0.5" />
+                </svg>
+                <div class="donut-center"><span>1,840</span><label>kcal</label></div>
+            </div>
+            <div class="macros">
+                <div class="macro-row">
+                    <div class="macro-label">
+                        <div class="mac-dot" style="background:#FF4C7A"></div>Protein
+                    </div>
+                    <div class="macro-val" style="color:#FF4C7A">92g</div>
+                </div>
+                <div class="macro-bar">
+                    <div class="macro-fill" style="width:73%;background:#FF4C7A"></div>
+                </div>
+                <div class="macro-row" style="margin-top:8px">
+                    <div class="macro-label">
+                        <div class="mac-dot" style="background:#F59E0B"></div>Carbs
+                    </div>
+                    <div class="macro-val" style="color:#F59E0B">210g</div>
+                </div>
+                <div class="macro-bar">
+                    <div class="macro-fill" style="width:62%;background:#F59E0B"></div>
+                </div>
+                <div class="macro-row" style="margin-top:8px">
+                    <div class="macro-label">
+                        <div class="mac-dot" style="background:#8B5CF6"></div>Fat
+                    </div>
+                    <div class="macro-val" style="color:#8B5CF6">54g</div>
+                </div>
+                <div class="macro-bar">
+                    <div class="macro-fill" style="width:45%;background:#8B5CF6"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Water reminder -->
+        <div class="water-reminder">
+            <div style="font-size:32px">💧</div>
+            <div>
+                <div style="font-size:14px;font-weight:700;color:var(--teal)">Intake Reminder</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:3px">View drinking records → 1.8L of 2.8L today
+                </div>
+            </div>
+            <div style="font-size:20px;color:var(--muted);margin-left:auto">›</div>
+        </div>
+
+        <!-- Meals -->
+        <div class="meal-card">
+            <div class="meal-header">
+                <div>
+                    <div class="meal-title">🌅 Breakfast</div>
+                    <div class="meal-time">08:15 AM</div>
+                </div>
+                <div class="meal-kcal">562 kcal</div>
+            </div>
+            <div class="meal-items">
+                <div class="meal-item"><span class="meal-item-name">Oats + banana smoothie</span><span
+                        class="meal-item-cal">320 kcal</span></div>
+                <div class="meal-item"><span class="meal-item-name">Boiled eggs (2)</span><span
+                        class="meal-item-cal">156 kcal</span></div>
+                <div class="meal-item"><span class="meal-item-name">Black coffee</span><span class="meal-item-cal">5
+                        kcal</span></div>
+            </div>
+            <div class="nutrient-tags">
+                <div class="ntag"
+                    style="color:#FF4C7A;border-color:rgba(255,76,122,0.3);background:rgba(255,76,122,0.08)">High
+                    Protein</div>
+                <div class="ntag"
+                    style="color:#22C55E;border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.08)">Fiber +</div>
+            </div>
+        </div>
+
+        <div class="meal-card">
+            <div class="meal-header">
+                <div>
+                    <div class="meal-title">☀️ Lunch</div>
+                    <div class="meal-time">01:30 PM</div>
+                </div>
+                <div class="meal-kcal">778 kcal</div>
+            </div>
+            <div class="meal-items">
+                <div class="meal-item"><span class="meal-item-name">Brown rice (1 cup)</span><span
+                        class="meal-item-cal">215 kcal</span></div>
+                <div class="meal-item"><span class="meal-item-name">Grilled chicken (150g)</span><span
+                        class="meal-item-cal">295 kcal</span></div>
+                <div class="meal-item"><span class="meal-item-name">Vegetable curry</span><span
+                        class="meal-item-cal">168 kcal</span></div>
+                <div class="meal-item"><span class="meal-item-name">Dal (100g)</span><span class="meal-item-cal">100
+                        kcal</span></div>
+            </div>
+            <div class="nutrient-tags">
+                <div class="ntag"
+                    style="color:#00E5CC;border-color:rgba(0,229,204,0.3);background:rgba(0,229,204,0.08)">Balanced
+                </div>
+                <div class="ntag"
+                    style="color:#F59E0B;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.08)">Complex
+                    Carbs</div>
+            </div>
+        </div>
+
+        <div class="meal-card">
+            <div class="meal-header">
+                <div>
+                    <div class="meal-title">🌙 Dinner</div>
+                    <div class="meal-time">08:00 PM</div>
+                </div>
+                <div class="meal-kcal">500 kcal</div>
+            </div>
+            <div class="meal-items">
+                <div class="meal-item"><span class="meal-item-name">Chapati (2)</span><span class="meal-item-cal">180
+                        kcal</span></div>
+                <div class="meal-item"><span class="meal-item-name">Paneer sabzi</span><span class="meal-item-cal">220
+                        kcal</span></div>
+                <div class="meal-item"><span class="meal-item-name">Mixed salad</span><span class="meal-item-cal">60
+                        kcal</span></div>
+            </div>
+        </div>
+
+        <div
+            style="background:linear-gradient(135deg,rgba(0,229,204,0.08),rgba(139,92,246,0.08));border:1px solid var(--border);border-radius:18px;padding:16px;text-align:center">
+            <div style="font-size:24px;margin-bottom:8px">🤖</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px">AI Meal Recommendation</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Based on today's activity + HRV, increase
+                protein by 20g. Consider magnesium-rich foods for better sleep quality.</div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a class="nav-item" href="dashboard.html">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Dashboard</div>
+        </a>
+        <a class="nav-item" href="activity.html">
+            <div class="nav-icon">🏃</div>
+            <div class="nav-label">Activity</div>
+        </a>
+        <a class="nav-item active" href="diet.html">
+            <div class="nav-icon">🥗</div>
+            <div class="nav-label">Diet</div>
+        </a>
+        <a class="nav-item" href="profile.html">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Profile</div>
+        </a>
+    </div>
+    <script>
+        document.getElementById('diet-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    </script>
+</body>
+
+</html>

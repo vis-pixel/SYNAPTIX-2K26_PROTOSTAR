@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioRhythm X — Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #030712;
+            --card: #0B1827;
+            --teal: #00E5CC;
+            --purple: #8B5CF6;
+            --text: #F0F6FF;
+            --muted: #7C8FAC;
+            --border: rgba(255, 255, 255, 0.08)
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative
+        }
+
+        /* Background effects */
+        .glow1 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 229, 204, 0.1), transparent 70%);
+            top: 20%;
+            left: 15%;
+            pointer-events: none
+        }
+
+        .glow2 {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08), transparent 70%);
+            bottom: 10%;
+            right: 10%;
+            pointer-events: none
+        }
+
+        .grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: .3;
+            pointer-events: none
+        }
+
+        /* Login card */
+        .login-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px 44px;
+            width: 420px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5)
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--teal), var(--purple), transparent);
+            border-radius: 2px
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px
+        }
+
+        .logo span {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--teal), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .logo p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 6px
+        }
+
+        .welcome {
+            text-align: center;
+            margin-bottom: 32px
+        }
+
+        .welcome h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -.5px;
+            margin-bottom: 6px
+        }
+
+        .welcome p {
+            font-size: 14px;
+            color: var(--muted)
+        }
+
+        .field {
+            margin-bottom: 20px
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 6px;
+            letter-spacing: .5px;
+            text-transform: uppercase
+        }
+
+        .field input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: .2s
+        }
+
+        .field input:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(0, 229, 204, 0.12)
+        }
+
+        .field input::placeholder {
+            color: rgba(124, 143, 172, 0.5)
+        }
+
+        .error {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #EF4444;
+            margin-bottom: 16px;
+            text-align: center;
+            animation: shake .4s ease
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            20%,
+            60% {
+                transform: translateX(-6px)
+            }
+
+            40%,
+            80% {
+                transform: translateX(6px)
+            }
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--teal), var(--purple));
+            color: #000;
+            font-size: 16px;
+            font-weight: 800;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: .2s;
+            font-family: inherit;
+            letter-spacing: .02em
+        }
+
+        .btn-login:hover {
+            opacity: .9;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(0, 229, 204, 0.3)
+        }
+
+        .btn-login:active {
+            transform: translateY(0)
+        }
+
+        .btn-login:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .footer-text span {
+            color: var(--teal);
+            font-weight: 600
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+            margin: 0 auto
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="glow1"></div>
+    <div class="glow2"></div>
+    <div class="grid-bg"></div>
+
+    <div class="login-card">
+        <div class="logo">
+            <span>⚡ BioRhythm X</span>
+            <p>AI Health Intelligence Platform</p>
+        </div>
+
+        <div class="welcome">
+            <h1>Welcome Back</h1>
+            <p>Sign in to access your health dashboard</p>
+        </div>
+
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="field">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter username" autocomplete="username" autofocus
+                    required>
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter password" autocomplete="current-password"
+                    required>
+            </div>
+
+            <div class="error" id="error-msg">Invalid username or password. Try again.</div>
+
+            <button type="submit" class="btn-login" id="login-btn">
+                <span id="btn-text">Sign In →</span>
+                <div class="spinner" id="spinner"></div>
+            </button>
+        </form>
+
+        <div class="footer-text">Powered by <span>15 ML models</span> · 6 clinical datasets</div>
+    </div>
+
+    <script>
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
+            const err = document.getElementById('error-msg');
+            const btn = document.getElementById('login-btn');
+            const btnText = document.getElementById('btn-text');
+            const spinner = document.getElementById('spinner');
+
+            err.style.display = 'none';
+
+            // Show loading
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+
+            setTimeout(() => {
+                if (user === 'srikar' && pass === '1234') {
+                    sessionStorage.setItem('biorhythm_logged_in', 'true');
+                    sessionStorage.setItem('biorhythm_user', 'srikar');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    err.style.display = 'block';
+                    btn.disabled = false;
+                    btnText.style.display = 'inline';
+                    spinner.style.display = 'none';
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                }
+            }, 800);
+        }
+    </script>
+</body>
+
+</html>

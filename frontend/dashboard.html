@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>if (!sessionStorage.getItem('biorhythm_logged_in')) window.location.href = 'login.html';</script>
+    <title>BioRhythm X — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #030712;
+            --sidebar: #07101F;
+            --card: #0B1827;
+            --card2: #0F1E35;
+            --teal: #00E5CC;
+            --pink: #FF4C7A;
+            --purple: #8B5CF6;
+            --blue: #3B82F6;
+            --orange: #F59E0B;
+            --green: #22C55E;
+            --lime: #84CC16;
+            --red: #EF4444;
+            --text: #F0F6FF;
+            --muted: #7C8FAC;
+            --border: rgba(255, 255, 255, 0.07);
+        }
+
+        html,
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100%;
+            overflow-x: hidden
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh
+        }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 50;
+            padding: 0
+        }
+
+        .sb-logo {
+            padding: 22px 20px 20px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .sb-logo a {
+            font-size: 17px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--teal), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: -.3px
+        }
+
+        .sb-section {
+            padding: 6px 0;
+            flex: 1;
+            overflow-y: auto
+        }
+
+        .sb-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            padding: 14px 16px 6px;
+            text-transform: uppercase
+        }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            cursor: pointer;
+            transition: .15s;
+            text-decoration: none;
+            border-radius: 0;
+            position: relative;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--muted)
+        }
+
+        .sb-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text)
+        }
+
+        .sb-item.active {
+            background: rgba(0, 229, 204, 0.07);
+            color: var(--teal);
+            font-weight: 600
+        }
+
+        .sb-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--teal);
+            border-radius: 0 2px 2px 0
+        }
+
+        .sb-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 15px
+        }
+
+        .sb-badge {
+            margin-left: auto;
+            background: var(--pink);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px
+        }
+
+        .sb-bottom {
+            border-top: 1px solid var(--border);
+            padding: 14px 16px
+        }
+
+        .sb-device {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 229, 204, 0.06);
+            border: 1px solid rgba(0, 229, 204, 0.15);
+            border-radius: 10px;
+            padding: 10px 12px
+        }
+
+        .dev-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 1.2s infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5)
+            }
+
+            70% {
+                box-shadow: 0 0 0 5px rgba(34, 197, 94, 0)
+            }
+        }
+
+        .dev-name {
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .dev-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px
+        }
+
+        /* ─── MAIN ─── */
+        .main {
+            margin-left: 240px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh
+        }
+
+        /* ─── TOPBAR ─── */
+        .topbar {
+            height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 40
+        }
+
+        .topbar-left h2 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -.3px
+        }
+
+        .topbar-left p {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 1px
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--green)
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 1s infinite
+        }
+
+        .risk-pill {
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid
+        }
+
+        .notif-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            position: relative;
+            transition: .2s
+        }
+
+        .notif-btn:hover {
+            border-color: var(--teal)
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 7px;
+            height: 7px;
+            background: var(--pink);
+            border-radius: 50%;
+            border: 1.5px solid var(--bg)
+        }
+
+        /* ─── CONTENT ─── */
+        .content {
+            padding: 28px 32px;
+            flex: 1
+        }
+
+        /* ─── ALERT BANNER ─── */
+        .alert-banner {
+            display: none;
+            background: linear-gradient(135deg, rgba(239, 68, 68, .12), rgba(239, 68, 68, .04));
+            border: 1px solid rgba(239, 68, 68, .3);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: slideDown .3s ease
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .alert-banner.hidden {
+            display: none !important
+        }
+
+        .al-icon {
+            font-size: 20px;
+            flex-shrink: 0
+        }
+
+        .al-text {
+            flex: 1
+        }
+
+        .al-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--red)
+        }
+
+        .al-msg {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .al-close {
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 18px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: .15s
+        }
+
+        .al-close:hover {
+            background: rgba(255, 255, 255, .05);
+            color: var(--text)
+        }
+
+        /* ─── METRIC CARDS GRID ─── */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 28px
+        }
+
+        @media(max-width:1200px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        .mc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            cursor: pointer;
+            transition: .25s;
+            position: relative;
+            overflow: hidden
+        }
+
+        .mc:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, .5)
+        }
+
+        .mc::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--c, var(--teal));
+            opacity: 0;
+            transition: .3s
+        }
+
+        .mc:hover::before,
+        .mc.active::before {
+            opacity: 1
+        }
+
+        .mc-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 18px
+        }
+
+        .mc-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0
+        }
+
+        .mc-meta {
+            flex: 1;
+            margin-left: 12px
+        }
+
+        .mc-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text)
+        }
+
+        .mc-time {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .mc-value {
+            text-align: right
+        }
+
+        .mc-num {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--c, var(--teal));
+            line-height: 1;
+            letter-spacing: -1px
+        }
+
+        .mc-unit {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        /* ─── CHART CANVAS ─── */
+        .chart-box {
+            height: 90px;
+            margin-top: 6px;
+            position: relative
+        }
+
+        .chart-box canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 5px
+        }
+
+        /* ─── PROGRESS BAR ─── */
+        .prog {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 12px 0 5px
+        }
+
+        .prog-f {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 1.2s ease;
+            position: relative
+        }
+
+        .prog-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--muted)
+        }
+
+        /* ─── HR ZONE BAR ─── */
+        .zone-bar {
+            display: flex;
+            height: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 12px 0 6px
+        }
+
+        .zone-seg {
+            flex: 1
+        }
+
+        .zone-labs {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--muted)
+        }
+
+        /* ─── MINI STATS ─── */
+        .mini-stats {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px
+        }
+
+        .ms {
+            flex: 1;
+            background: var(--card2);
+            border-radius: 10px;
+            padding: 9px 10px;
+            text-align: center
+        }
+
+        .ms-v {
+            font-size: 14px;
+            font-weight: 700
+        }
+
+        .ms-l {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        /* ─── BOTTOM CHARTS SECTION ─── */
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 28px
+        }
+
+        @media(max-width:1100px) {
+            .bottom-section {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .big-chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px
+        }
+
+        .bcc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px
+        }
+
+        .bcc-title {
+            font-size: 16px;
+            font-weight: 700
+        }
+
+        .bcc-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .tab-pills {
+            display: flex;
+            gap: 6px
+        }
+
+        .tab-pill {
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            transition: .15s;
+            background: transparent
+        }
+
+        .tab-pill.on {
+            background: rgba(0, 229, 204, 0.1);
+            border-color: rgba(0, 229, 204, 0.3);
+            color: var(--teal)
+        }
+
+        .big-chart {
+            height: 200px
+        }
+
+        .big-chart canvas {
+            width: 100% !important;
+            height: 100% !important
+        }
+
+        /* ─── AI INSIGHTS PANEL ─── */
+        .insights-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px
+        }
+
+        .insight-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start
+        }
+
+        .insight-item:last-child {
+            border-bottom: none
+        }
+
+        .ins-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0
+        }
+
+        .ins-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 3px
+        }
+
+        .ins-body {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.6
+        }
+
+        .sev-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-bottom: 4px
+        }
+
+        /* ─── DETAIL MODAL ─── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 200;
+            backdrop-filter: blur(8px);
+            animation: fadeIn .2s ease
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(820px, 90vw);
+            max-height: 85vh;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            z-index: 201;
+            animation: popIn .25s ease;
+            display: flex;
+            flex-direction: column
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(.96)
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1)
+            }
+        }
+
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, .15)
+        }
+
+        .modal-body {
+            padding: 28px;
+            overflow-y: auto;
+            flex: 1
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: .2s
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, .08);
+            color: var(--text)
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin: 20px 0
+        }
+
+        .modal-stat {
+            background: var(--card2);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center
+        }
+
+        .modal-stat-v {
+            font-size: 22px;
+            font-weight: 800
+        }
+
+        .modal-stat-l {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        .modal-chart {
+            height: 200px;
+            margin: 16px 0
+        }
+
+        .modal-chart canvas {
+            width: 100% !important;
+            height: 100% !important
+        }
+
+        .insight-box {
+            background: rgba(0, 229, 204, 0.04);
+            border: 1px solid rgba(0, 229, 204, 0.12);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-top: 16px
+        }
+
+        /* ─── SLEEP STAGES ─── */
+        .sleep-bar {
+            display: flex;
+            height: 24px;
+            gap: 2px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 14px 0
+        }
+
+        .ss {
+            border-radius: 3px
+        }
+
+        .ss-legend {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 4px
+        }
+
+        .ss-leg {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .ss-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px
+        }
+
+        /* ─── WATER TRACKER ─── */
+        .water-cups {
+            display: flex;
+            gap: 8px;
+            margin: 14px 0;
+            align-items: flex-end
+        }
+
+        .wc {
+            width: 30px;
+            height: 44px;
+            border: 2px solid var(--border);
+            border-radius: 0 0 8px 8px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: .2s;
+            flex-shrink: 0
+        }
+
+        .wc.full {
+            border-color: var(--blue)
+        }
+
+        .wc:hover {
+            transform: scale(1.08)
+        }
+
+        .wc-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, var(--teal), var(--blue));
+            border-radius: 0 0 6px 6px;
+            transition: height .8s cubic-bezier(.4, 0, .2, 1)
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sb-logo"><a href="index.html">⚡ BioRhythm X</a></div>
+        <div class="sb-section">
+            <div class="sb-label">Overview</div>
+            <a class="sb-item active" href="dashboard.html"><span class="sb-icon">📊</span> Dashboard</a>
+            <a class="sb-item" href="analytics.html"><span class="sb-icon">📈</span> Analytics</a>
+
+            <div class="sb-label">Health Metrics</div>
+            <a class="sb-item" href="#" onclick="openDetail('hr');return false"><span class="sb-icon">❤️</span> Heart
+                Rate</a>
+            <a class="sb-item" href="#" onclick="openDetail('spo2');return false"><span class="sb-icon">🫀</span> Blood
+                Oxygen</a>
+            <a class="sb-item" href="#" onclick="openDetail('hrv');return false"><span class="sb-icon">📡</span> HRV
+                Balance</a>
+            <a class="sb-item" href="#" onclick="openDetail('stress');return false"><span class="sb-icon">😌</span>
+                Stress</a>
+            <a class="sb-item" href="#" onclick="openDetail('temp');return false"><span class="sb-icon">🌡️</span> Skin
+                Temp</a>
+
+            <div class="sb-label">Lifestyle</div>
+            <a class="sb-item" href="activity.html"><span class="sb-icon">👟</span> Activity</a>
+            <a class="sb-item" href="#" onclick="openDetail('sleep');return false"><span class="sb-icon">🌙</span>
+                Sleep</a>
+            <a class="sb-item" href="#" onclick="openDetail('water');return false"><span class="sb-icon">💧</span>
+                Hydration</a>
+            <a class="sb-item" href="diet.html"><span class="sb-icon">🥗</span> Nutrition</a>
+
+            <div class="sb-label">System</div>
+            <a class="sb-item" href="profile.html"><span class="sb-icon">👤</span> Profile</a>
+            <a class="sb-item" href="#"><span class="sb-icon">🔔</span> Alerts <span class="sb-badge"
+                    id="alert-count">3</span></a>
+            <a class="sb-item" href="#"><span class="sb-icon">⚙️</span> Settings</a>
+        </div>
+        <div class="sb-bottom">
+            <div class="sb-device">
+                <div class="dev-dot"></div>
+                <div>
+                    <div class="dev-name">Fire-Boltt Pro</div>
+                    <div class="dev-sub">Synced 30s ago · 85%🔋</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <!-- TOP BAR -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <h2 id="today-title">Today</h2>
+                <p id="today-date"></p>
+            </div>
+            <div class="topbar-right">
+                <div class="live-badge">
+                    <div class="live-dot"></div>AI Monitoring Active &nbsp;·&nbsp; 15 fields
+                </div>
+                <div class="risk-pill" id="risk-pill"
+                    style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:var(--green)">Risk
+                    Score: <b id="risk-val">12</b></div>
+                <button class="notif-btn"
+                    onclick="triggerAlert('ECG: Elevated HR 108 BPM — Check activity level.')">🔔<span
+                        class="notif-badge"></span></button>
+                <a href="index.html"
+                    style="color:var(--muted);font-size:13px;text-decoration:none;padding:8px 14px;border:1px solid var(--border);border-radius:8px">←
+                    Home</a>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+            <!-- ALERT BANNER -->
+            <div class="alert-banner hidden" id="alert-banner">
+                <div class="al-icon">⚠️</div>
+                <div class="al-text">
+                    <div class="al-title" id="al-title">Anomaly Detected</div>
+                    <div class="al-msg" id="al-msg"></div>
+                </div>
+                <div class="al-close" onclick="this.parentElement.classList.add('hidden')">✕</div>
+            </div>
+
+            <!-- METRIC CARDS -->
+            <div class="cards-grid">
+
+                <!-- HEART RATE -->
+                <div class="mc" style="--c:#FF4C7A" onclick="openDetail('hr')">
+                    <div class="mc-header">
+                        <div class="mc-icon" style="background:rgba(255,76,122,0.12)"><span
+                                style="animation:hb 0.9s ease infinite;display:inline-block">❤️</span></div>
+                        <div class="mc-meta">
+                            <div class="mc-title">Heart Rate</div>
+                            <div class="mc-time">Just now</div>
+                        </div>
+                        <div class="mc-value">
+                            <div class="mc-num" id="hr-val">95</div>
+                            <div class="mc-unit">BPM</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;height:8px;border-radius:6px;overflow:hidden;margin-bottom:6px">
+                        <div style="flex:1.2;background:linear-gradient(90deg,#3B82F6,#22C55E)"></div>
+                        <div style="flex:1;background:linear-gradient(90deg,#22C55E,#F59E0B)"></div>
+                        <div style="flex:1;background:linear-gradient(90deg,#F59E0B,#F97316)"></div>
+                        <div style="flex:1;background:linear-gradient(90deg,#F97316,#FF4C7A)"></div>
+                        <div style="flex:.7;background:#FF4C7A"></div>
+                    </div>
+                    <div
+                        style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:10px">
+                        <span>Light</span><span>Weight</span><span>Aerobic</span><span>Anaerobic</span><span>VO₂</span>
+                    </div>
+                    <div class="chart-box"><canvas id="c-hr"></canvas></div>
+                    <div class="chart-labels">
+                        <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span>
+                    </div>
+                </div>
+
+                <!-- BLOOD OXYGEN -->
+                <div class="mc" style="--c:#00E5CC" onclick="openDetail('spo2')">
+                    <div class="mc-header">
+                        <div class="mc-icon" style="background:rgba(0,229,204,0.12)">🫀</div>
+                        <div class="mc-meta">
+                            <div class="mc-title">Blood Oxygen (SpO₂)</div>
+                            <div class="mc-time">PM 04:15</div>
+                        </div>
+                        <div class="mc-value">
+                            <div class="mc-num" id="spo2-val">98</div>
+                            <div class="mc-unit">%</div>
+                        </div>
+                    </div>
+                    <div class="prog">
+                        <div class="prog-f" id="spo2-bar"
+                            style="width:90%;background:linear-gradient(90deg,#00E5CC,#3B82F6)"></div>
+                    </div>
+                    <div class="prog-labels"><span>80%</span><span>Normal 95–100%</span><span>100%</span></div>
+                    <div class="chart-box" style="margin-top:14px"><canvas id="c-spo2"></canvas></div>
+                    <div class="chart-labels">
+                        <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span>
+                    </div>
+                </div>
+
+                <!-- STRESS -->
+                <div class="mc" style="--c:#84CC16" onclick="openDetail('stress')">
+                    <div class="mc-header">
+                        <div class="mc-icon" style="background:rgba(132,204,22,0.12)">😌</div>
+                        <div class="mc-meta">
+                            <div class="mc-title">Stress Level</div>
+                            <div class="mc-time">Average today</div>
+                        </div>
+                        <div class="mc-value">
+                            <div class="mc-num" id="stress-val">52</div>
+                            <div class="mc-unit">/ 100</div>
+                        </div>
+                    </div>
+                    <div class="chart-box"><canvas id="c-stress"></canvas></div>
+                    <div class="chart-labels">
+                        <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span>
+                    </div>
+                </div>
+
+                <!-- STEPS -->
+                <div class="mc" style="--c:#22C55E" onclick="openDetail('steps')">
+                    <div class="mc-header">
+                        <div class="mc-icon" style="background:rgba(34,197,94,0.12)">👟</div>
+                        <div class="mc-meta">
+                            <div class="mc-title">Steps Today</div>
+                            <div class="mc-time">Goal: 10,000</div>
+                        </div>
+                        <div class="mc-value">
+                            <div class="mc-num" id="steps-val">3,100</div>
+                            <div class="mc-unit">steps</div>
+                        </div>
+                    </div>
+                    <div class="chart-box"><canvas id="c-steps"></canvas></div>
+                    <div class="chart-labels">
+                        <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span>
+                    </div>
+                    <div class="mini-stats">
+                        <div class="ms">
+                            <div class="ms-v" style="color:var(--teal)">1.5 mi</div>
+                            <div class="ms-l">📍 Distance</div>
+                        </div>
+                        <div class="ms">
+                            <div class="ms-v" style="color:var(--orange)">139</div>
+                            <div class="ms-l">🔥 kcal</div>
+                        </div>
+                        <div class="ms">
+                            <div class="ms-v" style="color:var(--purple)">24.8m</div>
+                            <div class="ms-l">⏱ Active</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLEEP -->
+                <div class="mc" style="--c:#8B5CF6" onclick="openDetail('sleep')">
+                    <div class="mc-header">
+                        <div class="mc-icon" style="background:rgba(139,92,246,0.12)">🌙</div>
+                        <div class="mc-meta">
+                            <div class="mc-title">Sleep Analysis</div>
+                            <div class="mc-time">Last night</div>
+                        </div>
+                        <div class="mc-value">
+                            <div class="mc-num" style="font-size:28px">7<span
+                                    style="font-size:16px;color:var(--muted)">h</span> 24<span
+                                    style="font-size:16px;color:var(--muted)">m</span></div>
+                            <div class="mc-unit">8h goal</div>
+                        </div>
+                    </div>
+                    <div class="sleep-bar" id="sleep-stages"></div>
+                    <div class="ss-legend">
+                        <div class="ss-leg">
+                            <div class="ss-dot" style="background:#312E81"></div>Deep
+                        </div>
+                        <div class="ss-leg">
+                            <div class="ss-dot" style="background:#6D28D9"></div>Core
+                        </div>
+                        <div class="ss-leg">
+                            <div class="ss-dot" style="background:#8B5CF6"></div>REM
+                        </div>
+                        <div class="ss-leg">
+                            <div class="ss-dot" style="background:#C4B5FD"></div>Awake
+                        </div>
+                    </div>
+                    <div class="mini-stats">
+                        <div class="ms">
+                            <div class="ms-v" style="color:#312E81">1h 20m</div>
+                            <div class="ms-l">Deep</div>
+                        </div>
+                        <div class="ms">
+                            <div class="ms-v" style="color:#8B5CF6">3h 40m</div>
+                            <div class="ms-l">REM</div>
+                        </div>
+                        <div class="ms">
+                            <div class="ms-v" style="color:#C4B5FD">2h 24m</div>
+                            <div class="ms-l">Core</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WATER -->
+                <div class="mc" style="--c:#3B82F6" onclick="openDetail('water')">
+                    <div class="mc-header">
+                        <div class="mc-icon" style="background:rgba(59,130,246,0.12)">💧</div>
+                        <div class="mc-meta">
+                            <div class="mc-title">Hydration</div>
+                            <div class="mc-time">Next reminder in 30m</div>
+                        </div>
+                        <div class="mc-value">
+                            <div class="mc-num" id="water-val">1.8</div>
+                            <div class="mc-unit">of 2.8L</div>
+                        </div>
+                    </div>
+                    <div class="water-cups" id="water-cups"></div>
+                    <div class="prog">
+                        <div class="prog-f" style="width:64%;background:linear-gradient(90deg,#3B82F6,#00E5CC)"></div>
+                    </div>
+                    <div class="prog-labels"><span>0L</span><span style="color:var(--blue);font-weight:600">64% of
+                            goal</span><span>2.8L</span></div>
+                </div>
+
+            </div><!-- /cards-grid -->
+
+            <!-- BOTTOM ROW: BIG CHART + AI INSIGHTS -->
+            <div class="bottom-section">
+                <div class="big-chart-card">
+                    <div class="bcc-header">
+                        <div>
+                            <div class="bcc-title">Full-Day Vitals Overview</div>
+                            <div class="bcc-sub">Last 24 hours — live update every 2.5s</div>
+                        </div>
+                        <div class="tab-pills">
+                            <div class="tab-pill on" onclick="switchBigChart('hr',this)">Heart Rate</div>
+                            <div class="tab-pill" onclick="switchBigChart('spo2',this)">SpO₂</div>
+                            <div class="tab-pill" onclick="switchBigChart('stress',this)">Stress</div>
+                            <div class="tab-pill" onclick="switchBigChart('hrv',this)">HRV</div>
+                        </div>
+                    </div>
+                    <div class="big-chart"><canvas id="big-chart-canvas"></canvas></div>
+                    <div class="chart-labels" style="margin-top:8px">
+                        <span>00:00</span><span>03:00</span><span>06:00</span><span>09:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span><span>Now</span>
+                    </div>
+                </div>
+
+                <div class="insights-card">
+                    <div class="bcc-header" style="margin-bottom:4px">
+                        <div>
+                            <div class="bcc-title">🤖 AI Insights</div>
+                            <div class="bcc-sub">Live anomaly analysis</div>
+                        </div>
+                    </div>
+                    <div id="insights-list">
+                        <div class="insight-item">
+                            <div class="ins-icon" style="background:rgba(34,197,94,0.1)">✅</div>
+                            <div>
+                                <div class="sev-badge" style="background:rgba(34,197,94,0.12);color:var(--green)">
+                                    ●&nbsp;Normal</div>
+                                <div class="ins-title">Heart Rate</div>
+                                <div class="ins-body">72 BPM — well within healthy resting range. Parasympathetic
+                                    dominance detected.</div>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="ins-icon" style="background:rgba(245,158,11,0.1)">⚡</div>
+                            <div>
+                                <div class="sev-badge" style="background:rgba(245,158,11,0.12);color:var(--orange)">
+                                    ●&nbsp;Moderate</div>
+                                <div class="ins-title">Stress Level</div>
+                                <div class="ins-body">52/100 — elevated mid-day. WESAD model suggests 10-min mindfulness
+                                    session.</div>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="ins-icon" style="background:rgba(0,229,204,0.1)">💧</div>
+                            <div>
+                                <div class="sev-badge" style="background:rgba(0,229,204,0.12);color:var(--teal)">
+                                    ●&nbsp;Good</div>
+                                <div class="ins-title">Blood Oxygen</div>
+                                <div class="ins-body">98% SpO₂ — optimal. BIDMC model found no hypoxic events in last 6
+                                    hours.</div>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="ins-icon" style="background:rgba(139,92,246,0.1)">🌙</div>
+                            <div>
+                                <div class="sev-badge" style="background:rgba(139,92,246,0.12);color:var(--purple)">
+                                    ●&nbsp;Good</div>
+                                <div class="ins-title">Sleep Quality</div>
+                                <div class="ins-body">7h 24m · REM 49% — above average. Sleep-EDF model: fragmentation
+                                    low ✅</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HRV + TEMP ROW -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
+                <div class="mc" style="--c:#F59E0B" onclick="openDetail('hrv')">
+                    <div class="mc-header">
+                        <div class="mc-icon" style="background:rgba(245,158,11,0.12)">📡</div>
+                        <div class="mc-meta">
+                            <div class="mc-title">HRV Balance (RMSSD)</div>
+                            <div class="mc-time">Fantasia dataset model</div>
+                        </div>
+                        <div class="mc-value">
+                            <div class="mc-num" id="hrv-val">58</div>
+                            <div class="mc-unit">ms</div>
+                        </div>
+                    </div>
+                    <div class="chart-box"><canvas id="c-hrv"></canvas></div>
+                    <div class="chart-labels">
+                        <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span>
+                    </div>
+                </div>
+                <div class="mc" style="--c:#F97316" onclick="openDetail('temp')">
+                    <div class="mc-header">
+                        <div class="mc-icon" style="background:rgba(249,115,22,0.12)">🌡️</div>
+                        <div class="mc-meta">
+                            <div class="mc-title">Skin Temperature</div>
+                            <div class="mc-time">WESAD model · PM 04:20</div>
+                        </div>
+                        <div class="mc-value">
+                            <div class="mc-num" id="temp-val">36.4</div>
+                            <div class="mc-unit">°C</div>
+                        </div>
+                    </div>
+                    <div class="prog" style="margin-top:16px">
+                        <div class="prog-f" id="temp-bar"
+                            style="width:58%;background:linear-gradient(90deg,#3B82F6,#F97316)"></div>
+                    </div>
+                    <div class="prog-labels"><span>33°C Hypothermia</span><span></span><span>38°C Fever</span></div>
+                    <div class="chart-box" style="margin-top:12px"><canvas id="c-temp"></canvas></div>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+
+    <!-- DETAIL MODAL -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeDetail()"></div>
+    <div class="modal" id="modal" style="display:none">
+        <div class="modal-header">
+            <div style="display:flex;align-items:center;gap:14px">
+                <div class="mc-icon" id="modal-icon" style="font-size:24px;width:50px;height:50px;border-radius:14px">
+                </div>
+                <div>
+                    <h2 id="modal-title" style="font-size:20px;font-weight:800"></h2>
+                    <p id="modal-sub" style="font-size:12px;color:var(--muted);margin-top:2px"></p>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeDetail()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-stats" id="modal-stats"></div>
+            <div class="modal-chart"><canvas id="modal-chart-canvas"></canvas></div>
+            <div class="insight-box" id="modal-insight"></div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes hb {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            15% {
+                transform: scale(1.2)
+            }
+
+            30% {
+                transform: scale(1)
+            }
+        }
+    </style>
+
+    <script>
+        // ─── Setup ───────────────────────────────────────────
+        const now = new Date();
+        document.getElementById('today-date').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+        // ─── Live data ────────────────────────────────────────
+        function gen(base, amp, n, smooth = false) {
+            const r = Array.from({ length: n }, () => base + (Math.random() - .5) * amp);
+            return smooth ? r.map((v, i) => i ? r[i - 1] * .35 + v * .65 : v) : r;
+        }
+
+        const data = {
+            hr: gen(78, 28, 96, true),
+            spo2: gen(97.5, 3, 96, true),
+            stress: gen(48, 42, 96),
+            steps: Array.from({ length: 96 }, (_, i) => i < 40 ? 0 : Math.random() * 380 + 30),
+            hrv: gen(55, 22, 96, true),
+            temp: gen(36.4, 0.6, 96, true),
+        };
+        let stepCount = 3100;
+
+        function draw(id, d, color, type = 'line') {
+            const c = document.getElementById(id); if (!c) return;
+            c.width = c.offsetWidth || 400; c.height = c.offsetHeight || 90;
+            const ctx = c.getContext('2d'), W = c.width, H = c.height;
+            const max = Math.max(...d), min = Math.min(...d), rng = max - min || 1;
+            ctx.clearRect(0, 0, W, H);
+            if (type === 'bar') {
+                const bw = W / d.length - 1;
+                d.forEach((v, i) => {
+                    const bh = ((v - min) / rng) * H * .9 + 4;
+                    const g = ctx.createLinearGradient(0, H - bh, 0, H);
+                    g.addColorStop(0, color + 'DD'); g.addColorStop(1, color + '22');
+                    ctx.fillStyle = g;
+                    ctx.beginPath(); ctx.roundRect(i * (bw + 1), H - bh, bw, bh, 2); ctx.fill();
+                });
+            } else {
+                const pts = d.map((v, i) => ({ x: (i / (d.length - 1)) * W, y: H - ((v - min) / rng) * (H * .82) - H * .06 }));
+                ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+                ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();
+                ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+                const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, color + '44'); g.addColorStop(1, color + '00');
+                ctx.fillStyle = g; ctx.fill();
+            }
+        }
+
+        function drawAll() {
+            draw('c-hr', data.hr, '#FF4C7A');
+            draw('c-spo2', data.spo2, '#00E5CC');
+            draw('c-stress', data.stress, '#84CC16', 'bar');
+            draw('c-steps', data.steps, '#22C55E', 'bar');
+            draw('c-hrv', data.hrv, '#F59E0B');
+            draw('c-temp', data.temp, '#F97316');
+            if (curBigChart) draw('big-chart-canvas', data[curBigChart], bigChartColor, curBigChart === 'steps' || curBigChart === 'stress' ? 'bar' : 'line');
+        }
+
+        // Sleep stages
+        function initSleep() {
+            const el = document.getElementById('sleep-stages'); if (!el) return; el.innerHTML = '';
+            [[5, '#C4B5FD'], [16, '#312E81'], [22, '#6D28D9'], [8, '#C4B5FD'], [28, '#8B5CF6'], [11, '#312E81'], [10, '#8B5CF6']].forEach(([p, c]) => {
+                const d = document.createElement('div'); d.className = 'ss'; d.style.cssText = `width:${p}%;background:${c}`;
+                el.appendChild(d);
+            });
+        }
+
+        // Water cups
+        function initWater() {
+            const el = document.getElementById('water-cups'); if (!el) return; el.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const w = document.createElement('div'); w.className = 'wc' + (i < 6 ? ' full' : '');
+                const f = document.createElement('div'); f.className = 'wc-fill'; f.style.height = i < 6 ? '85%' : '0';
+                w.appendChild(f); w.onclick = (e) => { e.stopPropagation(); f.style.height = f.style.height === '0' ? '85%' : '0'; w.classList.toggle('full') };
+                el.appendChild(w);
+            }
+        }
+
+        window.addEventListener('load', () => { drawAll(); initSleep(); initWater() });
+        window.addEventListener('resize', drawAll);
+
+        // ─── Big chart ────────────────────────────────────────
+        let curBigChart = 'hr', bigChartColor = '#FF4C7A';
+        const bigColors = { hr: '#FF4C7A', spo2: '#00E5CC', stress: '#84CC16', hrv: '#F59E0B' };
+        function switchBigChart(key, el) {
+            document.querySelectorAll('.tab-pill').forEach(p => p.classList.remove('on'));
+            el.classList.add('on');
+            curBigChart = key; bigChartColor = bigColors[key];
+            draw('big-chart-canvas', data[key], bigChartColor, key === 'stress' ? 'bar' : 'line');
+        }
+        setTimeout(() => draw('big-chart-canvas', data.hr, '#FF4C7A'), 200);
+
+        // ─── Live updates ─────────────────────────────────────
+        setInterval(() => {
+            const newHR = Math.max(55, Math.min(115, data.hr[95] + (Math.random() - .45) * 8));
+            data.hr.shift(); data.hr.push(newHR);
+            document.getElementById('hr-val').textContent = Math.round(newHR);
+
+            const newSPO2 = Math.max(93, Math.min(100, data.spo2[95] + (Math.random() - .5)));
+            data.spo2.shift(); data.spo2.push(newSPO2);
+            document.getElementById('spo2-val').textContent = Math.round(newSPO2);
+            document.getElementById('spo2-bar').style.width = `${((newSPO2 - 80) / 20 * 100).toFixed(0)}%`;
+
+            const newStr = Math.max(10, Math.min(90, data.stress[95] + (Math.random() - .5) * 12));
+            data.stress.shift(); data.stress.push(newStr);
+            document.getElementById('stress-val').textContent = Math.round(newStr);
+
+            stepCount += Math.floor(Math.random() * 9);
+            data.steps.shift(); data.steps.push(Math.random() * 350 + 20);
+            document.getElementById('steps-val').textContent = stepCount.toLocaleString();
+
+            const newHRV = Math.max(30, Math.min(90, data.hrv[95] + (Math.random() - .5) * 5));
+            data.hrv.shift(); data.hrv.push(newHRV);
+            document.getElementById('hrv-val').textContent = Math.round(newHRV);
+
+            const newTemp = Math.max(35.5, Math.min(38.2, data.temp[95] + (Math.random() - .5) * .2));
+            data.temp.shift(); data.temp.push(newTemp);
+            document.getElementById('temp-val').textContent = newTemp.toFixed(1);
+            document.getElementById('temp-bar').style.width = `${((newTemp - 33) / (38 - 33) * 100).toFixed(0)}%`;
+
+            const risk = Math.min(100, Math.round(newStr * .3 + (100 - newSPO2) * 5 + (newHR > 100 ? 20 : 0)));
+            document.getElementById('risk-val').textContent = risk;
+            const rp = document.getElementById('risk-pill');
+            if (risk > 50) { rp.style.cssText = 'background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#EF4444;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid'; }
+            else if (risk > 25) { rp.style.cssText = 'background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#F59E0B;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid'; }
+            else { rp.style.cssText = 'background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.25);color:#22C55E;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid'; }
+
+            drawAll();
+            if (Math.random() < 0.04) triggerAlert(newHR >= 100 ? `⚠️ High HR: ${Math.round(newHR)} BPM — consider rest.` : newSPO2 < 95 ? `⚠️ Low SpO₂: ${Math.round(newSPO2)}% — breathe slowly.` : `⚡ Stress: ${Math.round(newStr)}/100 — try box breathing.`);
+        }, 2500);
+
+        function triggerAlert(msg) {
+            document.getElementById('al-title').textContent = '🤖 AI Anomaly Alert';
+            document.getElementById('al-msg').textContent = msg;
+            const b = document.getElementById('alert-banner');
+            b.classList.remove('hidden'); b.style.display = 'flex';
+            setTimeout(() => b.classList.add('hidden'), 7000);
+        }
+
+        // ─── Detail Modal ─────────────────────────────────────
+        const details = {
+            hr: {
+                icon: '❤️', bg: 'rgba(255,76,122,.12)', color: '#FF4C7A', title: 'Heart Rate Analysis', sub: 'MIT-BIH Arrhythmia Dataset · 24-hour history',
+                stats: [{ v: '55 BPM', l: 'Resting' }, { v: '108 BPM', l: 'Peak' }, { v: '78 BPM', l: 'Average' }, { v: 'Zone 3', l: 'Current Zone' }],
+                insight: 'Heart rate is within normal range. Peak detected during 12:00 activity session. MIT-BIH model found no arrhythmia patterns. VO₂ max estimated at 48 ml/kg/min — Good fitness level.', data: 'hr', color: '#FF4C7A'
+            },
+            spo2: {
+                icon: '🫀', bg: 'rgba(0,229,204,.12)', color: '#00E5CC', title: 'Blood Oxygen (SpO₂)', sub: 'BIDMC PPG Dataset · Peripheral oxygen saturation',
+                stats: [{ v: '94%', l: 'Minimum' }, { v: '99%', l: 'Maximum' }, { v: '97.5%', l: 'Average' }, { v: '0', l: 'Hypoxic Events' }],
+                insight: 'SpO₂ normal across all 24 hours. BIDMC clinical model found zero hypoxic events. Blood flow waveform shows strong perfusion. PPG signal quality: Excellent.', data: 'spo2', color: '#00E5CC'
+            },
+            stress: {
+                icon: '😌', bg: 'rgba(132,204,22,.12)', color: '#84CC16', title: 'Stress Level', sub: 'WESAD Multimodal Dataset · EDA + HRV fusion',
+                stats: [{ v: '22', l: 'Min' }, { v: '76', l: 'Peak 14:00' }, { v: '48', l: 'Average' }, { v: '3-class', l: 'WESAD Model' }],
+                insight: 'Moderate stress peak at 14:00 — work session detected. EDA baseline elevated. WESAD 3-class model: Stress detected during 13:00-15:00. Recommendation: 10-min box breathing (4-7-8 cycle).', data: 'stress', color: '#84CC16'
+            },
+            steps: {
+                icon: '👟', bg: 'rgba(34,197,94,.12)', color: '#22C55E', title: 'Steps & Activity', sub: 'MHEALTH 12-activity classifier',
+                stats: [{ v: '3,100', l: 'Steps' }, { v: '1.5 mi', l: 'Distance' }, { v: '139 kcal', l: 'Burned' }, { v: 'Walking', l: 'Activity' }],
+                insight: 'Most active period: 11:00-12:30. MHEALTH classifier detected Walking (72%), Light Jog (18%), Stationary (10%). Gait symmetry: 94% — Excellent. Step goal: 3,100/10,000 (31%).', data: 'steps', color: '#22C55E'
+            },
+            sleep: {
+                icon: '🌙', bg: 'rgba(139,92,246,.12)', color: '#8B5CF6', title: 'Sleep Analysis', sub: 'Sleep-EDF Database · 5-stage polysomnographic model',
+                stats: [{ v: '7h 24m', l: 'Total Sleep' }, { v: '1h 20m', l: 'Deep Sleep' }, { v: '3h 40m', l: 'REM' }, { v: '91%', l: 'Efficiency' }],
+                insight: 'Sleep quality: Good. Sleep-EDF model detected: Deep sleep 18% (optimal: 20%), REM 49% (above average). Circadian rhythm: in sync. Sleep fragmentation index: low ✅. Bedtime consistency: 4/7 days.', data: 'hrv', color: '#8B5CF6'
+            },
+            water: {
+                icon: '💧', bg: 'rgba(59,130,246,.12)', color: '#3B82F6', title: 'Hydration Tracker', sub: 'Smart daily goal: 2.8L',
+                stats: [{ v: '1.8L', l: 'Consumed' }, { v: '1.0L', l: 'Remaining' }, { v: '64%', l: 'Goal %' }, { v: '4d 🔥', l: 'Streak' }],
+                insight: 'On track for daily goal. Last drink: 2:30 PM. AI recommends drinking 250ml in next 30 mins. Post-workout hydration: adequate. Electrolyte balance: normal based on activity data.', data: 'spo2', color: '#3B82F6'
+            },
+            hrv: {
+                icon: '📡', bg: 'rgba(245,158,11,.12)', color: '#F59E0B', title: 'HRV Balance Index', sub: 'Fantasia Database · RMSSD Autonomic Analysis',
+                stats: [{ v: '58 ms', l: 'RMSSD' }, { v: '0.72', l: 'LF/HF Ratio' }, { v: 'Good', l: 'Recovery' }, { v: 'Para.', l: 'Dominance' }],
+                insight: 'Parasympathetic dominance — optimal recovery state. Fantasia model: LF/HF 0.72 (healthy <1.0). Training load: manageable. Recommend: continue current training plan. Sleep HRV: 68ms — elevated recovery.', data: 'hrv', color: '#F59E0B'
+            },
+            temp: {
+                icon: '🌡️', bg: 'rgba(249,115,22,.12)', color: '#F97316', title: 'Skin Temperature', sub: 'WESAD inflammation model',
+                stats: [{ v: '36.4°C', l: 'Current' }, { v: '35.9°C', l: 'Min' }, { v: '36.8°C', l: 'Max' }, { v: 'Normal', l: 'Status' }],
+                insight: 'Skin temperature within healthy range (36.0-37.5°C). WESAD model found no inflammation markers. Temperature variation follows circadian pattern — lowest at 06:00, highest at 15:00. No fever indicators.', data: 'temp', color: '#F97316'
+            },
+        };
+
+        function openDetail(key) {
+            const d = details[key]; if (!d) return;
+            document.getElementById('modal-icon').textContent = d.icon;
+            document.getElementById('modal-icon').style.background = d.bg;
+            document.getElementById('modal-title').textContent = d.title;
+            document.getElementById('modal-sub').textContent = d.sub;
+            document.getElementById('modal-stats').innerHTML = d.stats.map(s => `
+    <div class="modal-stat">
+      <div class="modal-stat-v" style="color:${d.color}">${s.v}</div>
+      <div class="modal-stat-l">${s.l}</div>
+    </div>`).join('');
+            document.getElementById('modal-insight').innerHTML = `<b style="color:${d.color}">🤖 AI Insight &nbsp;</b>${d.insight}`;
+            document.getElementById('modal-overlay').style.display = 'block';
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('modal').style.flexDirection = 'column';
+            setTimeout(() => {
+                const chartData = key === 'steps' ? data.steps : data[d.data] || gen(75, 25, 96, true);
+                const type = key === 'steps' || key === 'stress' ? 'bar' : 'line';
+                draw('modal-chart-canvas', chartData, d.color, type);
+            }, 80);
+        }
+        function closeDetail() {
+            document.getElementById('modal-overlay').style.display = 'none';
+            document.getElementById('modal').style.display = 'none';
+        }
+        document.addEventListener('keydown', e => e.key === 'Escape' && closeDetail());
+    </script>
+</body>
+
+</html>

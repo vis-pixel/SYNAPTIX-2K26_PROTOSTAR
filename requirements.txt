@@ -1,0 +1,58 @@
+# BioRhythm X — Requirements
+# Python 3.11+
+
+# Core Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.7
+websockets==12.0
+
+# Database
+sqlalchemy[asyncio]==2.0.25
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# Redis
+redis[hiredis]==5.0.1
+aioredis==2.0.1
+
+# Auth
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Data / ML
+numpy==1.26.3
+pandas==2.1.4
+scipy==1.12.0
+scikit-learn==1.4.0
+torch==2.1.2
+torchvision==0.16.2
+
+# ECG / Physiological Signal Parsing
+wfdb==4.1.2
+pyedflib==0.1.28
+mne==1.6.1
+
+# HTTP / Downloads
+httpx==0.26.0
+aiohttp==3.9.3
+aiofiles==23.2.1
+tqdm==4.66.1
+
+# Utilities
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+loguru==0.7.2
+tenacity==8.2.3
+cachetools==5.3.2
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+httpx==0.26.0
+faker==22.2.0
+
+# Monitoring
+prometheus-fastapi-instrumentator==6.1.0

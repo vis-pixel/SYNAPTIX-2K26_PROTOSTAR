@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioRhythm X — Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #030712;
+            --sidebar: #07101F;
+            --card: #0B1827;
+            --card2: #0F1E35;
+            --teal: #00E5CC;
+            --pink: #FF4C7A;
+            --purple: #8B5CF6;
+            --blue: #3B82F6;
+            --orange: #F59E0B;
+            --green: #22C55E;
+            --text: #F0F6FF;
+            --muted: #7C8FAC;
+            --border: rgba(255, 255, 255, 0.07)
+        }
+
+        html,
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100%
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh
+        }
+
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 50
+        }
+
+        .sb-logo {
+            padding: 22px 20px 20px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .sb-logo a {
+            font-size: 17px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--teal), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none
+        }
+
+        .sb-section {
+            padding: 6px 0;
+            flex: 1;
+            overflow-y: auto
+        }
+
+        .sb-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            padding: 14px 16px 6px;
+            text-transform: uppercase
+        }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            cursor: pointer;
+            transition: .15s;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--muted);
+            position: relative
+        }
+
+        .sb-item:hover {
+            background: rgba(255, 255, 255, .03);
+            color: var(--text)
+        }
+
+        .sb-item.active {
+            background: rgba(0, 229, 204, .07);
+            color: var(--teal);
+            font-weight: 600
+        }
+
+        .sb-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--teal);
+            border-radius: 0 2px 2px 0
+        }
+
+        .sb-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 15px
+        }
+
+        .sb-bottom {
+            border-top: 1px solid var(--border);
+            padding: 14px 16px
+        }
+
+        .sb-device {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 229, 204, .06);
+            border: 1px solid rgba(0, 229, 204, .15);
+            border-radius: 10px;
+            padding: 10px 12px
+        }
+
+        .dev-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 1.2s infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, .5)
+            }
+
+            70% {
+                box-shadow: 0 0 0 5px rgba(34, 197, 94, 0)
+            }
+        }
+
+        .dev-name {
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .dev-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px
+        }
+
+        .main {
+            margin-left: 240px;
+            flex: 1
+        }
+
+        .topbar {
+            height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(3, 7, 18, .8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 40
+        }
+
+        .topbar-left h2 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -.3px
+        }
+
+        .topbar-left p {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 1px
+        }
+
+        .content {
+            padding: 28px 32px
+        }
+
+        /* Range selector */
+        .range-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 28px;
+            align-items: center
+        }
+
+        .range-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            background: transparent;
+            transition: .15s
+        }
+
+        .range-btn.on {
+            background: rgba(0, 229, 204, .1);
+            border-color: rgba(0, 229, 204, .3);
+            color: var(--teal)
+        }
+
+        .range-divider {
+            height: 1px;
+            flex: 1;
+            background: var(--border)
+        }
+
+        /* Chart cards */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 28px
+        }
+
+        .ac {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px
+        }
+
+        .ac-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px
+        }
+
+        .ac-title {
+            font-size: 15px;
+            font-weight: 700
+        }
+
+        .ac-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        .ac-val {
+            font-size: 28px;
+            font-weight: 900;
+            text-align: right
+        }
+
+        .ac-unit {
+            font-size: 12px;
+            color: var(--muted);
+            text-align: right;
+            margin-top: 2px
+        }
+
+        .chart-200 {
+            height: 180px
+        }
+
+        .chart-200 canvas {
+            width: 100% !important;
+            height: 100% !important
+        }
+
+        .chart-lbs {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 6px
+        }
+
+        /* Full width chart */
+        .fw-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px
+        }
+
+        /* Correlation table */
+        .corr-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 12px
+        }
+
+        .corr-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .corr-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, .03);
+            transition: .15s
+        }
+
+        .corr-table tr:hover td {
+            background: rgba(255, 255, 255, .02)
+        }
+
+        .corr-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+        .corr-bar-outer {
+            height: 6px;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 6px;
+            width: 120px;
+            display: inline-block;
+            vertical-align: middle
+        }
+
+        .corr-bar-inner {
+            height: 100%;
+            border-radius: 6px;
+            display: inline-block
+        }
+
+        /* Weekly summary */
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 16px
+        }
+
+        .wday {
+            background: var(--card2);
+            border-radius: 12px;
+            padding: 14px 8px;
+            text-align: center
+        }
+
+        .wday.today {
+            background: rgba(0, 229, 204, .08);
+            border: 1px solid rgba(0, 229, 204, .2)
+        }
+
+        .wd-day {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 8px
+        }
+
+        .wd-val {
+            font-size: 16px;
+            font-weight: 800
+        }
+
+        .wd-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .wd-bar {
+            height: 4px;
+            border-radius: 4px;
+            margin: 8px auto 0;
+            max-width: 32px
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sb-logo"><a href="index.html">⚡ BioRhythm X</a></div>
+        <div class="sb-section">
+            <div class="sb-label">Overview</div>
+            <a class="sb-item" href="dashboard.html"><span class="sb-icon">📊</span> Dashboard</a>
+            <a class="sb-item active" href="analytics.html"><span class="sb-icon">📈</span> Analytics</a>
+            <div class="sb-label">Health Metrics</div>
+            <a class="sb-item" href="dashboard.html"><span class="sb-icon">❤️</span> Heart Rate</a>
+            <a class="sb-item" href="dashboard.html"><span class="sb-icon">🫀</span> Blood Oxygen</a>
+            <a class="sb-item" href="dashboard.html"><span class="sb-icon">📡</span> HRV Balance</a>
+            <a class="sb-item" href="dashboard.html"><span class="sb-icon">😌</span> Stress</a>
+            <div class="sb-label">Lifestyle</div>
+            <a class="sb-item" href="activity.html"><span class="sb-icon">👟</span> Activity</a>
+            <a class="sb-item" href="dashboard.html"><span class="sb-icon">🌙</span> Sleep</a>
+            <a class="sb-item" href="dashboard.html"><span class="sb-icon">💧</span> Hydration</a>
+            <a class="sb-item" href="diet.html"><span class="sb-icon">🥗</span> Nutrition</a>
+            <div class="sb-label">System</div>
+            <a class="sb-item" href="profile.html"><span class="sb-icon">👤</span> Profile</a>
+            <a class="sb-item" href="#"><span class="sb-icon">⚙️</span> Settings</a>
+        </div>
+        <div class="sb-bottom">
+            <div class="sb-device">
+                <div class="dev-dot"></div>
+                <div>
+                    <div class="dev-name">Fire-Boltt Pro</div>
+                    <div class="dev-sub">Synced 30s ago · 85%🔋</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h2>Analytics</h2>
+                <p id="top-date">Health trends & insights</p>
+            </div>
+            <div style="display:flex;gap:10px">
+                <a href="dashboard.html"
+                    style="padding:8px 18px;border:1px solid var(--border);border-radius:8px;color:var(--muted);text-decoration:none;font-size:13px">←
+                    Dashboard</a>
+                <a href="index.html"
+                    style="padding:8px 18px;border:1px solid var(--border);border-radius:8px;color:var(--muted);text-decoration:none;font-size:13px">←
+                    Home</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Range selector -->
+            <div class="range-bar">
+                <div class="range-btn on" onclick="setRange('1D',this)">1D</div>
+                <div class="range-btn" onclick="setRange('7D',this)">7D</div>
+                <div class="range-btn" onclick="setRange('30D',this)">30D</div>
+                <div class="range-btn" onclick="setRange('3M',this)">3M</div>
+                <div class="range-divider"></div>
+                <span style="font-size:12px;color:var(--muted)">Auto-updating every 2.5s</span>
+            </div>
+
+            <!-- 4 mini analytics cards -->
+            <div class="analytics-grid">
+                <div class="ac">
+                    <div class="ac-header">
+                        <div>
+                            <div class="ac-title">❤️ Heart Rate Trend</div>
+                            <div class="ac-sub">24h · MIT-BIH model</div>
+                        </div>
+                        <div>
+                            <div class="ac-val" style="color:#FF4C7A" id="an-hr">78 BPM</div>
+                            <div class="ac-unit">avg today</div>
+                        </div>
+                    </div>
+                    <div class="chart-200"><canvas id="a-hr"></canvas></div>
+                    <div class="chart-lbs">
+                        <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span></div>
+                </div>
+                <div class="ac">
+                    <div class="ac-header">
+                        <div>
+                            <div class="ac-title">🫀 SpO₂ Trend</div>
+                            <div class="ac-sub">24h · BIDMC model</div>
+                        </div>
+                        <div>
+                            <div class="ac-val" style="color:#00E5CC" id="an-spo2">97.5 %</div>
+                            <div class="ac-unit">avg today</div>
+                        </div>
+                    </div>
+                    <div class="chart-200"><canvas id="a-spo2"></canvas></div>
+                    <div class="chart-lbs">
+                        <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span></div>
+                </div>
+                <div class="ac">
+                    <div class="ac-header">
+                        <div>
+                            <div class="ac-title">😌 Stress Pattern</div>
+                            <div class="ac-sub">24h · WESAD model</div>
+                        </div>
+                        <div>
+                            <div class="ac-val" style="color:#84CC16" id="an-str">48</div>
+                            <div class="ac-unit">avg score</div>
+                        </div>
+                    </div>
+                    <div class="chart-200"><canvas id="a-str"></canvas></div>
+                    <div class="chart-lbs">
+                        <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span></div>
+                </div>
+                <div class="ac">
+                    <div class="ac-header">
+                        <div>
+                            <div class="ac-title">📡 HRV RMSSD</div>
+                            <div class="ac-sub">24h · Fantasia model</div>
+                        </div>
+                        <div>
+                            <div class="ac-val" style="color:#F59E0B" id="an-hrv">58 ms</div>
+                            <div class="ac-unit">avg RMSSD</div>
+                        </div>
+                    </div>
+                    <div class="chart-200"><canvas id="a-hrv"></canvas></div>
+                    <div class="chart-lbs">
+                        <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span></div>
+                </div>
+            </div>
+
+            <!-- Weekly Steps -->
+            <div class="fw-card">
+                <div class="ac-header">
+                    <div>
+                        <div class="ac-title">👟 Weekly Activity Overview</div>
+                        <div class="ac-sub">Steps, calories, and activity time per day</div>
+                    </div>
+                    <div style="color:var(--teal);font-size:18px;font-weight:800">24,210 <span
+                            style="font-size:13px;color:var(--muted)">weekly steps</span></div>
+                </div>
+                <div class="week-grid">
+                    <div class="wday">
+                        <div class="wd-day">MON</div>
+                        <div class="wd-val" style="color:var(--teal)">8,420</div>
+                        <div class="wd-sub">steps</div>
+                        <div class="wd-bar" style="background:var(--teal);height:4px;width:100%"></div>
+                    </div>
+                    <div class="wday">
+                        <div class="wd-day">TUE</div>
+                        <div class="wd-val" style="color:var(--blue)">6,200</div>
+                        <div class="wd-sub">steps</div>
+                        <div class="wd-bar" style="background:var(--blue);height:4px;width:74%"></div>
+                    </div>
+                    <div class="wday">
+                        <div class="wd-day">WED</div>
+                        <div class="wd-val" style="color:var(--teal)">9,100</div>
+                        <div class="wd-sub">steps</div>
+                        <div class="wd-bar" style="background:var(--teal);height:4px;width:100%"></div>
+                    </div>
+                    <div class="wday">
+                        <div class="wd-day">THU</div>
+                        <div class="wd-val" style="color:var(--blue)">7,800</div>
+                        <div class="wd-sub">steps</div>
+                        <div class="wd-bar" style="background:var(--blue);height:4px;width:92%"></div>
+                    </div>
+                    <div class="wday today">
+                        <div class="wd-day" style="color:var(--teal)">FRI ✦</div>
+                        <div class="wd-val" style="color:var(--teal)" id="wk-steps">3,100</div>
+                        <div class="wd-sub">steps (live)</div>
+                        <div class="wd-bar" style="background:var(--teal);height:4px;width:37%"></div>
+                    </div>
+                    <div class="wday">
+                        <div class="wd-day">SAT</div>
+                        <div class="wd-val" style="color:var(--muted)">—</div>
+                        <div class="wd-sub">upcoming</div>
+                        <div class="wd-bar" style="background:var(--border);height:4px;width:0"></div>
+                    </div>
+                    <div class="wday">
+                        <div class="wd-day">SUN</div>
+                        <div class="wd-val" style="color:var(--muted)">—</div>
+                        <div class="wd-sub">upcoming</div>
+                        <div class="wd-bar" style="background:var(--border);height:4px;width:0"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Correlation table -->
+            <div class="fw-card">
+                <div class="ac-header" style="margin-bottom:0">
+                    <div>
+                        <div class="ac-title">🧠 Cross-Metric Correlations</div>
+                        <div class="ac-sub">AI-detected relationships between health fields</div>
+                    </div>
+                </div>
+                <table class="corr-table">
+                    <tr>
+                        <th>Field A</th>
+                        <th>Field B</th>
+                        <th>Correlation</th>
+                        <th>Strength</th>
+                        <th>AI Insight</th>
+                    </tr>
+                    <tr>
+                        <td>❤️ Heart Rate</td>
+                        <td>😌 Stress</td>
+                        <td><span class="corr-badge" style="background:rgba(255,76,122,.1);color:#FF4C7A">+0.82
+                                Strong</span></td>
+                        <td>
+                            <div class="corr-bar-outer">
+                                <div class="corr-bar-inner" style="width:82%;background:#FF4C7A;height:100%"></div>
+                            </div>
+                        </td>
+                        <td style="color:var(--muted);font-size:12px">HR elevates with stress — expected physiological
+                            coupling</td>
+                    </tr>
+                    <tr>
+                        <td>🌙 Sleep</td>
+                        <td>📡 HRV</td>
+                        <td><span class="corr-badge" style="background:rgba(139,92,246,.1);color:#8B5CF6">+0.74
+                                Strong</span></td>
+                        <td>
+                            <div class="corr-bar-outer">
+                                <div class="corr-bar-inner" style="width:74%;background:#8B5CF6;height:100%"></div>
+                            </div>
+                        </td>
+                        <td style="color:var(--muted);font-size:12px">Better sleep → higher HRV next morning (recovery)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>👟 Steps</td>
+                        <td>😌 Stress</td>
+                        <td><span class="corr-badge" style="background:rgba(34,197,94,.1);color:#22C55E">-0.61
+                                Moderate</span></td>
+                        <td>
+                            <div class="corr-bar-outer">
+                                <div class="corr-bar-inner" style="width:61%;background:#22C55E;height:100%"></div>
+                            </div>
+                        </td>
+                        <td style="color:var(--muted);font-size:12px">Physical activity reduces stress levels — walk
+                            more</td>
+                    </tr>
+                    <tr>
+                        <td>💧 Hydration</td>
+                        <td>🌡️ Skin Temp</td>
+                        <td><span class="corr-badge" style="background:rgba(245,158,11,.1);color:#F59E0B">-0.45
+                                Weak</span></td>
+                        <td>
+                            <div class="corr-bar-outer">
+                                <div class="corr-bar-inner" style="width:45%;background:#F59E0B;height:100%"></div>
+                            </div>
+                        </td>
+                        <td style="color:var(--muted);font-size:12px">Adequate hydration slightly reduces skin
+                            temperature</td>
+                    </tr>
+                    <tr>
+                        <td>🫀 SpO₂</td>
+                        <td>🌙 Sleep Quality</td>
+                        <td><span class="corr-badge" style="background:rgba(0,229,204,.1);color:#00E5CC">+0.58
+                                Moderate</span></td>
+                        <td>
+                            <div class="corr-bar-outer">
+                                <div class="corr-bar-inner" style="width:58%;background:#00E5CC;height:100%"></div>
+                            </div>
+                        </td>
+                        <td style="color:var(--muted);font-size:12px">Higher SpO₂ → deeper sleep, better REM duration
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('top-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+        function gen(base, amp, n, s = false) {
+            const r = Array.from({ length: n }, () => base + (Math.random() - .5) * amp);
+            return s ? r.map((v, i) => i ? r[i - 1] * .35 + v * .65 : v) : r;
+        }
+
+        const aData = { hr: gen(78, 28, 96, true), spo2: gen(97.5, 3, 96, true), str: gen(48, 42, 96), hrv: gen(55, 22, 96, true) };
+
+        function drawA(id, d, color, type = 'line') {
+            const c = document.getElementById(id); if (!c) return;
+            c.width = c.offsetWidth || 400; c.height = c.offsetHeight || 180;
+            const ctx = c.getContext('2d'), W = c.width, H = c.height;
+            const mx = Math.max(...d), mn = Math.min(...d), rng = mx - mn || 1;
+            ctx.clearRect(0, 0, W, H);
+            if (type === 'bar') {
+                const bw = W / d.length - 1;
+                d.forEach((v, i) => {
+                    const bh = ((v - mn) / rng) * H * .9 + 4;
+                    const g = ctx.createLinearGradient(0, H - bh, 0, H);
+                    g.addColorStop(0, color + 'DD'); g.addColorStop(1, color + '22');
+                    ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect(i * (bw + 1), H - bh, bw, bh, 2); ctx.fill();
+                });
+            } else {
+                const pts = d.map((v, i) => ({ x: (i / (d.length - 1)) * W, y: H - ((v - mn) / rng) * (H * .82) - H * .06 }));
+                ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+                ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+                ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+                const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, color + '44'); g.addColorStop(1, color + '00');
+                ctx.fillStyle = g; ctx.fill();
+            }
+        }
+
+        function drawAll() {
+            drawA('a-hr', aData.hr, '#FF4C7A');
+            drawA('a-spo2', aData.spo2, '#00E5CC');
+            drawA('a-str', aData.str, '#84CC16', 'bar');
+            drawA('a-hrv', aData.hrv, '#F59E0B');
+        }
+        window.addEventListener('load', drawAll);
+        window.addEventListener('resize', drawAll);
+
+        let sc = 3100;
+        setInterval(() => {
+            aData.hr.shift(); aData.hr.push(Math.max(55, Math.min(115, aData.hr[aData.hr.length - 1] + (Math.random() - .45) * 8)));
+            aData.spo2.shift(); aData.spo2.push(Math.max(93, Math.min(100, aData.spo2[aData.spo2.length - 1] + (Math.random() - .5))));
+            aData.str.shift(); aData.str.push(Math.max(10, Math.min(90, aData.str[aData.str.length - 1] + (Math.random() - .5) * 12)));
+            aData.hrv.shift(); aData.hrv.push(Math.max(30, Math.min(90, aData.hrv[aData.hrv.length - 1] + (Math.random() - .5) * 5)));
+            document.getElementById('an-hr').textContent = Math.round(aData.hr.reduce((a, b) => a + b) / aData.hr.length) + ' BPM';
+            document.getElementById('an-spo2').textContent = (aData.spo2.reduce((a, b) => a + b) / aData.spo2.length).toFixed(1) + ' %';
+            document.getElementById('an-str').textContent = Math.round(aData.str.reduce((a, b) => a + b) / aData.str.length);
+            document.getElementById('an-hrv').textContent = Math.round(aData.hrv.reduce((a, b) => a + b) / aData.hrv.length) + ' ms';
+            sc += Math.floor(Math.random() * 9);
+            if (document.getElementById('wk-steps')) document.getElementById('wk-steps').textContent = sc.toLocaleString();
+            drawAll();
+        }, 2500);
+
+        function setRange(r, el) {
+            document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('on'));
+            el.classList.add('on');
+        }
+    </script>
+</body>
+
+</html>

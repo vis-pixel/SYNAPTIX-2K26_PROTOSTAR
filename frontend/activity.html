@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+    <title>BioRhythm X — Activity</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #080F1E;
+            --card: #0E1728;
+            --card2: #131E30;
+            --teal: #00E5CC;
+            --pink: #FF4C7A;
+            --purple: #8B5CF6;
+            --orange: #F59E0B;
+            --green: #22C55E;
+            --text: #E8F0FE;
+            --muted: #6B7DA8;
+            --border: rgba(255, 255, 255, 0.07)
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            max-width: 430px;
+            margin: 0 auto;
+            padding-bottom: 90px;
+            min-height: 100vh
+        }
+
+        .header {
+            padding: 20px 20px 16px;
+            background: rgba(8, 15, 30, 0.92);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 50
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        .scroll {
+            padding: 0 20px
+        }
+
+        /* Ring */
+        .ring-section {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 22px;
+            margin-bottom: 16px
+        }
+
+        .ring-wrap {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0
+        }
+
+        .ring-wrap svg {
+            transform: rotate(-90deg)
+        }
+
+        .ring-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center
+        }
+
+        .ring-center span {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--teal)
+        }
+
+        .ring-center label {
+            font-size: 9px;
+            color: var(--muted);
+            display: block
+        }
+
+        .ring-stats {
+            flex: 1
+        }
+
+        .ring-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px
+        }
+
+        .ring-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        .ring-stat-v {
+            font-size: 16px;
+            font-weight: 700
+        }
+
+        .ring-stat-l {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        /* Activity list */
+        .act-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: .2s
+        }
+
+        .act-card:hover {
+            transform: scale(1.01);
+            border-color: rgba(255, 255, 255, 0.12)
+        }
+
+        .act-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0
+        }
+
+        .act-info {
+            flex: 1
+        }
+
+        .act-name {
+            font-size: 15px;
+            font-weight: 700
+        }
+
+        .act-time {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .act-stats {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px
+        }
+
+        .act-stat {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .act-stat span {
+            color: var(--text);
+            font-weight: 600
+        }
+
+        .act-val {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--c, var(--teal))
+        }
+
+        .act-unit {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        /* Weekly bar chart */
+        .week-chart {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px
+        }
+
+        .week-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 14px
+        }
+
+        .week-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 80px
+        }
+
+        .week-bar {
+            flex: 1;
+            border-radius: 6px 6px 0 0;
+            background: var(--c, var(--teal));
+            opacity: .7;
+            transition: height 1s ease;
+            cursor: pointer;
+            position: relative
+        }
+
+        .week-bar.today {
+            opacity: 1;
+            box-shadow: 0 0 16px var(--c, var(--teal))55
+        }
+
+        .week-bar:hover {
+            opacity: 1
+        }
+
+        .week-labels {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px
+        }
+
+        .week-label {
+            flex: 1;
+            text-align: center;
+            font-size: 10px;
+            color: var(--muted)
+        }
+
+        .week-label.today {
+            color: var(--teal);
+            font-weight: 700
+        }
+
+        /* Bottom nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: rgba(8, 15, 30, 0.95);
+            backdrop-filter: blur(30px);
+            border-top: 1px solid var(--border);
+            padding: 10px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 4px 18px;
+            text-decoration: none
+        }
+
+        .nav-icon {
+            font-size: 22px
+        }
+
+        .nav-label {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 600
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--teal)
+        }
+
+        @keyframes fillBar {
+            from {
+                height: 0
+            }
+
+            to {
+                height: var(--h)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Activity</h1>
+        <p id="act-date">Friday, February 27</p>
+    </div>
+
+    <div class="scroll">
+        <!-- Activity ring -->
+        <div class="ring-section">
+            <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10" />
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="url(#rg)" stroke-width="10"
+                        stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="167" id="act-ring" />
+                    <defs>
+                        <linearGradient id="rg" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#00E5CC" />
+                            <stop offset="100%" stop-color="#8B5CF6" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="ring-center"><span>31%</span><label>of goal</label></div>
+            </div>
+            <div class="ring-stats">
+                <div class="ring-stat">
+                    <div class="ring-dot" style="background:#FF4C7A"></div>
+                    <div>
+                        <div class="ring-stat-v">420 <span style="font-size:12px;color:var(--muted)">kcal</span></div>
+                        <div class="ring-stat-l">🔥 Active Energy</div>
+                    </div>
+                </div>
+                <div class="ring-stat">
+                    <div class="ring-dot" style="background:#00E5CC"></div>
+                    <div>
+                        <div class="ring-stat-v">48 <span style="font-size:12px;color:var(--muted)">min</span></div>
+                        <div class="ring-stat-l">⚡ Exercise</div>
+                    </div>
+                </div>
+                <div class="ring-stat">
+                    <div class="ring-dot" style="background:#22C55E"></div>
+                    <div>
+                        <div class="ring-stat-v">7 <span style="font-size:12px;color:var(--muted)">hrs</span></div>
+                        <div class="ring-stat-l">🧍 Standing</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly steps -->
+        <div class="week-chart">
+            <div class="week-title">Steps this week</div>
+            <div class="week-bars" id="week-bars"></div>
+            <div class="week-labels">
+                <div class="week-label">Mon</div>
+                <div class="week-label">Tue</div>
+                <div class="week-label">Wed</div>
+                <div class="week-label">Thu</div>
+                <div class="week-label today">Fri</div>
+                <div class="week-label">Sat</div>
+                <div class="week-label">Sun</div>
+            </div>
+        </div>
+
+        <!-- Activity log -->
+        <div class="act-card" style="--c:#FF4C7A">
+            <div class="act-icon" style="background:rgba(255,76,122,0.15)">🏃</div>
+            <div class="act-info">
+                <div class="act-name">Morning Run</div>
+                <div class="act-time">06:30 AM · 28 min</div>
+                <div class="act-stats">
+                    <div class="act-stat">📍 <span>3.2 km</span></div>
+                    <div class="act-stat">🔥 <span>312 kcal</span></div>
+                    <div class="act-stat">❤️ <span>142 BPM</span></div>
+                </div>
+            </div>
+            <div style="text-align:right">
+                <div class="act-val">142</div>
+                <div class="act-unit">BPM avg</div>
+            </div>
+        </div>
+
+        <div class="act-card" style="--c:#22C55E">
+            <div class="act-icon" style="background:rgba(34,197,94,0.15)">🚶</div>
+            <div class="act-info">
+                <div class="act-name">Evening Walk</div>
+                <div class="act-time">05:00 PM · 20 min</div>
+                <div class="act-stats">
+                    <div class="act-stat">📍 <span>1.5 km</span></div>
+                    <div class="act-stat">🔥 <span>95 kcal</span></div>
+                    <div class="act-stat">❤️ <span>89 BPM</span></div>
+                </div>
+            </div>
+            <div style="text-align:right">
+                <div class="act-val">89</div>
+                <div class="act-unit">BPM avg</div>
+            </div>
+        </div>
+
+        <div class="act-card" style="--c:#F59E0B">
+            <div class="act-icon" style="background:rgba(245,158,11,0.15)">💪</div>
+            <div class="act-info">
+                <div class="act-name">Exercise Records</div>
+                <div class="act-time">View training records</div>
+                <div class="act-stats">
+                    <div class="act-stat">Week: <span>5 sessions</span></div>
+                    <div class="act-stat">Total: <span>187 min</span></div>
+                </div>
+            </div>
+            <div style="font-size:20px;color:var(--muted)">›</div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav">
+        <a class="nav-item" href="dashboard.html">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Dashboard</div>
+        </a>
+        <a class="nav-item active" href="activity.html">
+            <div class="nav-icon">🏃</div>
+            <div class="nav-label">Activity</div>
+        </a>
+        <a class="nav-item" href="diet.html">
+            <div class="nav-icon">🥗</div>
+            <div class="nav-label">Diet</div>
+        </a>
+        <a class="nav-item" href="profile.html">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Profile</div>
+        </a>
+    </div>
+
+    <script>
+        document.getElementById('act-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+        const stepData = [8420, 6200, 9100, 7800, 3100, 0, 0];
+        const maxS = Math.max(...stepData.filter(v => v > 0));
+        const bars = document.getElementById('week-bars');
+        const colors = ['#00E5CC', '#00E5CC', '#00E5CC', '#00E5CC', '#8B5CF6', '#3B82F6', '#3B82F6'];
+        stepData.forEach((v, i) => {
+            const b = document.createElement('div');
+            b.className = 'week-bar' + (i === 4 ? ' today' : '');
+            b.style.cssText = `height:${v ? Math.max(8, v / maxS * 80) : 4}px;background:${colors[i]};--c:${colors[i]}`;
+            b.title = `${v.toLocaleString()} steps`;
+            bars.appendChild(b);
+        });
+    </script>
+</body>
+
+</html>
