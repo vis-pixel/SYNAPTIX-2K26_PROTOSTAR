@@ -1,0 +1,561 @@
+/* ─────────────────────────────────────────────────────
+   Quantum Companion — Main Application Controller
+   Handles: Navigation, Sensor Simulation, LSTM Anomaly,
+            Charts, Alert System, Cloud Sync, UI Events
+───────────────────────────────────────────────────── */
+
+'use strict';
+
+// ═══════════════════════════════════════════════════
+// 1. NAVIGATION & TAB ROUTING
+// ═══════════════════════════════════════════════════
+const pageTitles = {
+    dashboard: 'Sensor Dashboard',
+    anomaly: 'Anomaly Detection Engine',
+    visualizer: '3D Field Visualizer',
+    alerts: 'Alert System',
+    cloud: 'Cloud Synchronization',
+    docs: 'Docs & API Reference'
+};
+
+let activeTab = 'dashboard';
+
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', e => {
+        e.preventDefault();
+        const tab = item.dataset.tab;
+        switchTab(tab);
+        item.closest('.sidebar').querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+    });
+});
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    const el = document.getElementById('tab-' + tab);
+    if (el) el.classList.add('active');
+    document.getElementById('pageTitle').textContent = pageTitles[tab] || tab;
+    activeTab = tab;
+}
+
+// Sidebar toggle (mobile)
+document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+});
+
+// ═══════════════════════════════════════════════════
+// 2. LIVE CLOCK
+// ═══════════════════════════════════════════════════
+function updateClock() {
+    const now = new Date();
+    document.getElementById('topbarTime').textContent = now.toLocaleTimeString('en-GB');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ═══════════════════════════════════════════════════
+// 3. SENSOR SIMULATION ENGINE
+// ═══════════════════════════════════════════════════
+const MAX_POINTS = 60;
+const ppgData = Array.from({ length: MAX_POINTS }, () => 75 + Math.random() * 8);
+const edaData = Array.from({ length: MAX_POINTS }, () => 4.0 + Math.random() * 0.6);
+const qr1Data = Array.from({ length: MAX_POINTS }, () => 94 + Math.random() * 2);
+const qr2Data = Array.from({ length: MAX_POINTS }, () => 90 + Math.random() * 2);
+const labels = Array.from({ length: MAX_POINTS }, (_, i) => i);
+
+let anomalyInjected = false;
+let anomalyScore = 0.1;
+let anomalyDecay = 0;
+
+function generatePPG(prev) {
+    const base = anomalyInjected ? 88 + Math.random() * 6 : 75 + Math.random() * 8;
+    return base + Math.sin(Date.now() / 800) * 3;
+}
+function generateEDA(prev) {
+    const spike = anomalyInjected ? 1.5 : 0;
+    return 4.0 + Math.sin(Date.now() / 1200) * 0.3 + Math.random() * 0.2 + spike;
+}
+function generateQR1() { return 94 + Math.sin(Date.now() / 2000) * 1.5 + (anomalyInjected ? -3 : 0); }
+function generateQR2() { return 90 + Math.cos(Date.now() / 1800) * 1.2 + Math.random() * 0.5; }
+
+function pushData(arr, val) {
+    arr.push(val);
+    if (arr.length > MAX_POINTS) arr.shift();
+}
+
+// ═══════════════════════════════════════════════════
+// 4. CHART.JS SETUP
+// ═══════════════════════════════════════════════════
+Chart.defaults.color = '#8892B0';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+
+function makeChart(id, label, color, data, yMin, yMax) {
+    const ctx = document.getElementById(id)?.getContext('2d');
+    if (!ctx) return null;
+    const gradient = ctx.createLinearGradient(0, 0, 0, 180);
+    gradient.addColorStop(0, color + '40');
+    gradient.addColorStop(1, color + '00');
+
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [...labels],
+            datasets: [{
+                label,
+                data: [...data],
+                borderColor: color,
+                backgroundColor: gradient,
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+            scales: {
+                x: { display: false },
+                y: {
+                    min: yMin, max: yMax,
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                    ticks: { font: { family: 'JetBrains Mono', size: 10 } }
+                }
+            }
+        }
+    });
+}
+
+const chartPPG = makeChart('chartPPG', 'PPG (bpm)', '#00D4FF', ppgData, 60, 110);
+const chartEDA = makeChart('chartEDA', 'EDA (μS)', '#FFB547', edaData, 2, 8);
+
+// Quantum Resonance — dual-channel overlay
+const qrCtx = document.getElementById('chartQR')?.getContext('2d');
+let chartQR = null;
+if (qrCtx) {
+    const grad1 = qrCtx.createLinearGradient(0, 0, 0, 180);
+    grad1.addColorStop(0, '#6C63FF40'); grad1.addColorStop(1, '#6C63FF00');
+    const grad2 = qrCtx.createLinearGradient(0, 0, 0, 180);
+    grad2.addColorStop(0, '#FF4E6A30'); grad2.addColorStop(1, '#FF4E6A00');
+    chartQR = new Chart(qrCtx, {
+        type: 'line',
+        data: {
+            labels: [...labels],
+            datasets: [
+                { label: 'QR Channel A', data: [...qr1Data], borderColor: '#6C63FF', backgroundColor: grad1, borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true },
+                { label: 'QR Channel B', data: [...qr2Data], borderColor: '#FF4E6A', backgroundColor: grad2, borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true, borderDash: [4, 3] }
+            ]
+        },
+        options: {
+            animation: false, responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: true, labels: { font: { size: 11 }, boxWidth: 12 } } },
+            scales: {
+                x: { display: false },
+                y: { min: 84, max: 100, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { family: 'JetBrains Mono', size: 10 } } }
+            }
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════
+// 5. SIMULATED LSTM ANOMALY ENGINE
+// ═══════════════════════════════════════════════════
+let anomalyBaseline = 0.1;
+
+function computeAnomalyScore() {
+    // Simulate LSTM reconstruction error: weighted multi-signal deviation
+    const hrDev = Math.abs(ppgData[ppgData.length - 1] - 78) / 20;
+    const edaDev = Math.abs(edaData[edaData.length - 1] - 4.2) / 2;
+    const qrDev = Math.abs(qr1Data[qr1Data.length - 1] - 94) / 5;
+    const rawScore = (hrDev * 0.4 + edaDev * 0.3 + qrDev * 0.3);
+    // EWMA smoothing
+    anomalyScore = 0.85 * anomalyScore + 0.15 * rawScore;
+    if (anomalyInjected) anomalyScore = Math.min(1.0, anomalyScore + 0.08);
+    return Math.min(1.0, anomalyScore);
+}
+
+function updateGauge(score) {
+    const arc = document.getElementById('gaugeArc');
+    const val = document.getElementById('gaugeVal');
+    const badge = document.getElementById('anomalyBadge');
+    if (!arc || !val) return;
+
+    const circumference = 534;
+    const offset = circumference * (1 - score);
+    arc.style.strokeDashoffset = offset;
+    val.textContent = score.toFixed(2);
+    document.getElementById('valAnomaly').textContent = score.toFixed(2);
+
+    if (score < 0.35) {
+        badge.textContent = 'NOMINAL';
+        badge.className = 'stat-badge good';
+        val.style.color = '#00E5A0';
+    } else if (score < 0.65) {
+        badge.textContent = 'WARNING';
+        badge.className = 'stat-badge warn';
+        val.style.color = '#FFB547';
+    } else {
+        badge.textContent = 'CRITICAL';
+        badge.className = 'stat-badge crit';
+        val.style.color = '#FF4E6A';
+    }
+}
+
+// ─── HEATMAP ───
+function drawHeatmap() {
+    const canvas = document.getElementById('heatmapCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const signals = ['PPG / HR', 'HRV', 'Skin Temp', 'EDA', 'QR-A', 'QR-B'];
+    const timeSlots = 12;
+    const cellW = (W - 60) / timeSlots, cellH = (H - 30) / signals.length;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0d1220';
+    ctx.fillRect(0, 0, W, H);
+
+    signals.forEach((sig, si) => {
+        ctx.fillStyle = '#8892B0';
+        ctx.font = '10px Inter';
+        ctx.textAlign = 'right';
+        ctx.fillText(sig, 54, 15 + si * cellH + cellH / 2 + 4);
+
+        for (let ti = 0; ti < timeSlots; ti++) {
+            // Deviation magnitude — injects pattern when anomaly is high
+            let dev = Math.random() * 0.3;
+            if (anomalyInjected && ti > 7) dev = 0.6 + Math.random() * 0.4;
+            dev = Math.min(1, Math.round(dev * 10) / 10);
+
+            const r = Math.round(10 + dev * 245);
+            const g = Math.round(78 + (1 - dev) * 130);
+            const b = Math.round(200 - dev * 60);
+            ctx.fillStyle = `rgba(${r},${g},${b},0.85)`;
+            ctx.fillRect(60 + ti * cellW + 1, 5 + si * cellH + 1, cellW - 2, cellH - 2);
+        }
+    });
+
+    // Time labels
+    ctx.fillStyle = '#4A5568';
+    ctx.font = '9px JetBrains Mono';
+    ctx.textAlign = 'center';
+    for (let ti = 0; ti < timeSlots; ti++) {
+        ctx.fillText(`T-${(timeSlots - ti) * 5}m`, 60 + ti * cellW + cellW / 2, H - 4);
+    }
+}
+
+// ─── EVENT LOG ───
+function addLogEntry(severity, msg) {
+    const log = document.getElementById('eventLog');
+    if (!log) return;
+    const time = new Date().toLocaleTimeString('en-GB');
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${severity}`;
+    entry.innerHTML = `<span class="log-time">${time}</span><span class="log-msg">${msg}</span>`;
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+}
+
+// ─── INJECTION CONTROLS ───
+document.getElementById('btnInject')?.addEventListener('click', () => {
+    anomalyInjected = true;
+    anomalyDecay = 80; // keep elevated for ~8 seconds
+    addLogEntry('critical', '⚠ ANOMALY INJECTED — Multi-signal spike detected. Running Bayesian classifier...');
+    showToast('critical', '⚠ Critical Alert', 'Multi-signal anomaly detected! Bayesian risk: 78%');
+    addAlertFeedItem('critical', 'Multi-Signal Spike', 'LSTM reconstruction error > 0.75 across HR, EDA, QR-A channels.');
+});
+
+document.getElementById('btnReset')?.addEventListener('click', () => {
+    anomalyInjected = false;
+    anomalyScore = 0.1;
+    anomalyDecay = 0;
+    addLogEntry('nominal', '↺ Baseline reset. Adaptive LSTM re-calibrating to current physiological state.');
+});
+
+// ═══════════════════════════════════════════════════
+// 6. MODE SELECTOR
+// ═══════════════════════════════════════════════════
+const modeConfig = {
+    medical: {
+        icon: '🏥',
+        name: 'Medical Mode',
+        desc: 'Optimized for patient biosignal monitoring and early clinical warning',
+        rules: [
+            { signal: 'Heart Rate', threshold: '> 2.0σ deviation', severity: 'warning' },
+            { signal: 'HRV Drop', threshold: '> 1.5σ below baseline', severity: 'warning' },
+            { signal: 'Skin Temp', threshold: '> +0.8°C gradient', severity: 'info' },
+            { signal: 'LSTM Anomaly Score', threshold: '> 0.65', severity: 'critical' },
+            { signal: 'EDA Spike', threshold: '> 3.0σ in 60s window', severity: 'warning' },
+        ]
+    },
+    aerospace: {
+        icon: '🚀',
+        name: 'Aerospace Mode',
+        desc: 'Real-time crew physiology monitoring under g-force and vacuum conditions',
+        rules: [
+            { signal: 'QR Field Coherence', threshold: '< 98.5%', severity: 'critical' },
+            { signal: 'Pilot HR (G-exposure)', threshold: '> 140 bpm', severity: 'critical' },
+            { signal: 'Autonomic Imbalance', threshold: 'HRV drop > 40%', severity: 'warning' },
+            { signal: 'EDA / Stress Proxy', threshold: '> 4.5σ', severity: 'warning' },
+            { signal: 'Resonance Freq. Drift', threshold: '> ±0.5 Hz', severity: 'info' },
+        ]
+    },
+    research: {
+        icon: '🔬',
+        name: 'Research Mode',
+        desc: 'Full-precision logging for academic and clinical research protocols',
+        rules: [
+            { signal: 'All Channels Log', threshold: '100% raw capture at 250 Hz', severity: 'info' },
+            { signal: 'Baseline Variance', threshold: 'Alert on >1.0σ drift from 7-day avg.', severity: 'info' },
+            { signal: 'Inter-Signal Correlation', threshold: 'Flag |ρ| > 0.85 cross-pairs', severity: 'warning' },
+            { signal: 'LSTM Latent Drift', threshold: 'Monitor hidden state vector shift', severity: 'info' },
+        ]
+    }
+};
+
+let currentMode = 'medical';
+
+function setMode(mode) {
+    currentMode = mode;
+    const conf = modeConfig[mode];
+    document.querySelectorAll('.mode-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === mode);
+    });
+    const display = document.getElementById('activeModeDisplay');
+    if (display) {
+        document.getElementById('modeNameDisplay').textContent = conf.name;
+        document.getElementById('modeDescDisplay').textContent = conf.desc;
+        display.querySelector('.mode-icon').textContent = conf.icon;
+    }
+    const rulesEl = document.getElementById('alertRules');
+    if (rulesEl) {
+        rulesEl.innerHTML = conf.rules.map(r => `
+      <div class="alert-rule-item">
+        <div class="rule-left">
+          <div>
+            <div class="rule-signal">${r.signal}</div>
+            <div class="rule-threshold">${r.threshold}</div>
+          </div>
+        </div>
+        <div class="rule-severity sev-${r.severity}">${r.severity.toUpperCase()}</div>
+      </div>`).join('');
+    }
+}
+setMode('medical');
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+});
+
+// ─── TEST ALERT ───
+document.getElementById('btnTestAlert')?.addEventListener('click', () => {
+    const conf = modeConfig[currentMode];
+    const rule = conf.rules[Math.floor(Math.random() * conf.rules.length)];
+    const sev = rule.severity;
+    showToast(sev, `${conf.icon} ${sev.toUpperCase()}: ${rule.signal}`, rule.threshold);
+    addAlertFeedItem(sev, rule.signal, rule.threshold);
+});
+
+document.getElementById('btnClearAlerts')?.addEventListener('click', () => {
+    const list = document.getElementById('alertFeedList');
+    if (list) list.innerHTML = '<div class="no-alerts">✓ All systems nominal. No active alerts.</div>';
+});
+
+// ─── ALERT FEED HELPER ───
+function addAlertFeedItem(severity, title, msg) {
+    const list = document.getElementById('alertFeedList');
+    if (!list) return;
+    const noAlert = list.querySelector('.no-alerts');
+    if (noAlert) noAlert.remove();
+    const time = new Date().toLocaleTimeString('en-GB');
+    const item = document.createElement('div');
+    item.className = `alert-feed-item ${severity}`;
+    item.innerHTML = `
+    <div class="afi-header">
+      <span class="afi-title">${title}</span>
+      <span class="afi-time">${time}</span>
+    </div>
+    <div class="afi-msg">${msg}</div>`;
+    list.prepend(item);
+}
+
+// ═══════════════════════════════════════════════════
+// 7. TOAST NOTIFICATION
+// ═══════════════════════════════════════════════════
+const toastIcons = { info: 'ℹ️', warning: '⚠️', critical: '🚨' };
+function showToast(severity, title, msg) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast ${severity}`;
+    toast.innerHTML = `
+    <div class="toast-icon">${toastIcons[severity] || '🔔'}</div>
+    <div class="toast-body">
+      <div class="toast-title">${title}</div>
+      <div class="toast-msg">${msg}</div>
+    </div>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4200);
+}
+
+// ═══════════════════════════════════════════════════
+// 8. CLOUD SYNC SIMULATION
+// ═══════════════════════════════════════════════════
+let syncProgress = 0;
+let totalDataKB = 0;
+let syncRunning = false;
+
+function startSync() {
+    if (syncRunning) return;
+    syncRunning = true;
+    syncProgress = 0;
+    document.getElementById('lastSync').textContent = new Date().toLocaleTimeString('en-GB');
+    const tick = setInterval(() => {
+        syncProgress = Math.min(100, syncProgress + (2 + Math.random() * 5));
+        totalDataKB += 12 + Math.random() * 20;
+        document.getElementById('syncBarFill').style.width = syncProgress + '%';
+        document.getElementById('syncPercent').textContent = Math.round(syncProgress) + '%';
+        document.getElementById('dataTransferred').textContent = (totalDataKB / 1000).toFixed(2) + ' MB';
+        document.getElementById('cloudLatency').textContent = Math.round(12 + Math.random() * 20) + ' ms';
+
+        if (syncProgress >= 100) {
+            clearInterval(tick);
+            syncRunning = false;
+            document.getElementById('cloudStatus').textContent = 'Synced ✓';
+            document.getElementById('lastSync').textContent = new Date().toLocaleTimeString('en-GB');
+            setTimeout(() => {
+                document.getElementById('cloudStatus').textContent = 'Syncing';
+                setTimeout(startSync, 8000);
+            }, 3000);
+        }
+    }, 150);
+}
+setTimeout(startSync, 1000);
+
+// Edge AI Toggle
+document.getElementById('toggleEdgeAI')?.addEventListener('change', function () {
+    const conn = document.getElementById('connectionStatus');
+    if (this.checked) {
+        conn.innerHTML = '<span class="status-dot online"></span><span>Edge AI (Local)</span>';
+        document.getElementById('edgeStatus').textContent = 'Forced Local';
+        document.getElementById('cloudStatus').textContent = 'Disconnected';
+        document.getElementById('esInference').textContent = '8 ms';
+        document.getElementById('esAccuracy').textContent = '96.9%';
+        document.getElementById('esPower').textContent = '195 mW';
+        showToast('info', '🔌 Edge AI Mode', 'All inference running locally. Cloud sync paused.');
+    } else {
+        conn.innerHTML = '<span class="status-dot online"></span><span>Edge AI Active</span>';
+        document.getElementById('edgeStatus').textContent = 'Active';
+        document.getElementById('cloudStatus').textContent = 'Syncing';
+        document.getElementById('esInference').textContent = '12 ms';
+        document.getElementById('esAccuracy').textContent = '97.4%';
+        document.getElementById('esPower').textContent = '240 mW';
+        startSync();
+    }
+});
+
+// ═══════════════════════════════════════════════════
+// 9. 3D VISUALIZER CONTROLS
+// ═══════════════════════════════════════════════════
+document.querySelectorAll('.viz-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.viz-mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.viz;
+        window.QCVisualizer?.setMode(mode);
+        document.getElementById('vizLabel').textContent =
+            mode === 'gravity' ? 'Gravitational Field — Particle Simulation' : 'Quantum Resonance Chamber — Ring Array';
+    });
+});
+
+document.getElementById('fieldIntensity')?.addEventListener('input', function () {
+    document.getElementById('fieldIntensityVal').textContent = this.value + '%';
+    window.QCVisualizer?.setFieldIntensity(+this.value);
+});
+document.getElementById('rotSpeed')?.addEventListener('input', function () {
+    document.getElementById('rotSpeedVal').textContent = this.value + '%';
+    window.QCVisualizer?.setRotSpeed(+this.value);
+});
+document.getElementById('particleCount')?.addEventListener('input', function () {
+    document.getElementById('particleCountVal').textContent = this.value;
+    window.QCVisualizer?.setParticleCount(+this.value);
+});
+document.getElementById('toggleBubble')?.addEventListener('change', function () {
+    window.QCVisualizer?.setBubble(this.checked);
+});
+
+// Live stats in visualizer panel
+let vizT = 0;
+setInterval(() => {
+    vizT += 0.05;
+    document.getElementById('vizFieldVec').textContent = (0.0 + Math.sin(vizT) * 0.02).toFixed(3) + 'G';
+    document.getElementById('vizRPM').textContent = (45220 + Math.floor(Math.sin(vizT * 0.7) * 200)).toLocaleString();
+    document.getElementById('vizCoherence').textContent = (99.4 + Math.sin(vizT * 1.5) * 0.4).toFixed(1) + '%';
+}, 500);
+
+// ═══════════════════════════════════════════════════
+// 10. MAIN REAL-TIME UPDATE LOOP (1 Hz)
+// ═══════════════════════════════════════════════════
+let tickCount = 0;
+setInterval(() => {
+    tickCount++;
+
+    // Manage anomaly decay
+    if (anomalyInjected && anomalyDecay > 0) {
+        anomalyDecay--;
+        if (anomalyDecay === 0) {
+            anomalyInjected = false;
+            addLogEntry('nominal', '✓ Anomaly levels returning to baseline. LSTM re-adapting.');
+        }
+    }
+
+    // Push new sensor data
+    pushData(ppgData, generatePPG());
+    pushData(edaData, generateEDA());
+    pushData(qr1Data, generateQR1());
+    pushData(qr2Data, generateQR2());
+
+    // Update charts
+    if (chartPPG) {
+        chartPPG.data.datasets[0].data = [...ppgData];
+        chartPPG.update('none');
+    }
+    if (chartEDA) {
+        chartEDA.data.datasets[0].data = [...edaData];
+        chartEDA.update('none');
+    }
+    if (chartQR) {
+        chartQR.data.datasets[0].data = [...qr1Data];
+        chartQR.data.datasets[1].data = [...qr2Data];
+        chartQR.update('none');
+    }
+
+    // Update stat cards
+    const hrVal = ppgData[ppgData.length - 1];
+    const edaVal = edaData[edaData.length - 1];
+    const qrVal = qr1Data[qr1Data.length - 1];
+    document.getElementById('valHR').textContent = Math.round(hrVal);
+    document.getElementById('valEDA').textContent = edaVal.toFixed(1);
+    document.getElementById('valQR').textContent = qrVal.toFixed(1);
+    document.getElementById('trendHR').textContent = hrVal > 80 ? '▲ Elevated' : '▼ Normal';
+    document.getElementById('trendEDA').textContent = edaVal > 5.0 ? '▲ Rising' : '◆ Stable';
+
+    // LSTM anomaly engine
+    const score = computeAnomalyScore();
+    updateGauge(score);
+
+    // Random warning events (low probability)
+    if (Math.random() < 0.04 && !anomalyInjected) {
+        addLogEntry('warning', '⚡ Micro-deviation cluster detected in HRV + EDA. Monitoring for 60s.');
+        showToast('warning', '⚡ Micro-Deviation', 'HRV + EDA correlated drift detected. Watching...');
+        addAlertFeedItem('warning', 'HRV + EDA Micro-Drift', 'Correlated deviation below critical threshold. Continued monitoring active.');
+    }
+
+    // Heatmap refresh every 3 ticks
+    if (tickCount % 3 === 0) drawHeatmap();
+}, 1000);
+
+// Initial draws
+drawHeatmap();
